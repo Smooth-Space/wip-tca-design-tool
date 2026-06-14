@@ -396,6 +396,12 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
           />
         </div>
       </Section>
+
+      <Section title="Export">
+        <Button className="w-full" onClick={onExport} disabled={exporting}>
+          {exporting ? "Exporting…" : "Export JPG"}
+        </Button>
+      </Section>
     </aside>
   );
 }
