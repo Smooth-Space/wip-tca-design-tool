@@ -85,6 +85,7 @@ export function computeMultiLayout(
   titleRows: number,
   titleSizePx: number,
   seed: number,
+  bandHeightOverride?: number,
 ): Placement[] {
   const imgs = images.slice(0, 3);
   if (imgs.length === 0) return [];
