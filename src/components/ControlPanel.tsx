@@ -80,13 +80,110 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
   );
 }
 
+const GRID_COLS: Record<number, string> = {
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+  4: "grid-cols-4",
+};
+
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+  columns,
+  getLabel,
+  size = "md",
+  capitalize = false,
+}: {
+  options: readonly T[];
+  value: T;
+  onChange: (v: T) => void;
+  columns: number;
+  getLabel?: (v: T) => string;
+  size?: "sm" | "md";
+  capitalize?: boolean;
+}) {
+  return (
+    <div className={cn("grid gap-1 rounded-lg bg-muted p-1", GRID_COLS[columns])}>
+      {options.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          className={cn(
+            "rounded-md font-medium transition-colors",
+            size === "sm" ? "py-1 text-xs" : "py-1.5 text-sm",
+            capitalize && "capitalize",
+            value === o
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {getLabel ? getLabel(o) : o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function RerollButton({
+  onClick,
+  disabled,
+  tooltip,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  tooltip: string;
+}) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="block">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              disabled={disabled}
+              onClick={onClick}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs">{label}</Label>
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
+      />
+    </div>
+  );
+}
+
 export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
 
-  const usesImage =
-    comp.variant === "split" || comp.variant === "full" || comp.variant === "inset";
+  const usesImage = comp.variant === "split" || comp.variant === "full";
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -130,101 +227,59 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
       <h1 className="text-lg font-semibold">Composer</h1>
 
       <Section title="Format">
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
-          {FORMATS.map((f) => (
-            <button
-              key={f}
-              onClick={() => update({ format: f })}
-              className={cn(
-                "rounded-md py-1.5 text-sm font-medium transition-colors",
-                comp.format === f
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={FORMATS}
+          value={comp.format}
+          onChange={(f) => update({ format: f })}
+          columns={3}
+        />
       </Section>
 
       <Section title="Template">
-        <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t}
-              onClick={() =>
-                setComp((c) => {
-                  let titles = c.titles;
-                  if (t === "D" && titles.length < 2) {
-                    const defaults = ["Title one", "Title two"];
-                    titles = [...titles];
-                    while (titles.length < 2) {
-                      titles.push({
-                        id: crypto.randomUUID(),
-                        text: defaults[titles.length] ?? "New title",
-                      });
-                    }
-                  }
-                  return {
-                    ...c,
-                    template: t,
-                    titles,
-                    variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
-                  };
-                })
+        <SegmentedControl
+          options={TEMPLATES}
+          value={comp.template}
+          columns={4}
+          onChange={(t) =>
+            setComp((c) => {
+              let titles = c.titles;
+              if (t === "D" && titles.length < 2) {
+                const defaults = ["Title one", "Title two"];
+                titles = [...titles];
+                while (titles.length < 2) {
+                  titles.push({
+                    id: crypto.randomUUID(),
+                    text: defaults[titles.length] ?? "New title",
+                  });
+                }
               }
-              className={cn(
-                "rounded-md py-1.5 text-sm font-medium transition-colors",
-                comp.template === t
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+              return {
+                ...c,
+                template: t,
+                titles,
+                variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
+              };
+            })
+          }
+        />
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Variant</Label>
             {comp.variant === "multi" && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="block">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => update({ multiSeed: newSeed() })}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>Reroll layout</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <RerollButton
+                onClick={() => update({ multiSeed: newSeed() })}
+                tooltip="Reroll layout"
+              />
             )}
           </div>
-          <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
-            {TEMPLATE_VARIANTS[comp.template].map((v) => (
-              <button
-                key={v}
-                onClick={() => update({ variant: v })}
-                className={cn(
-                  "rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
-                  comp.variant === v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={TEMPLATE_VARIANTS[comp.template]}
+            value={comp.variant}
+            onChange={(v) => update({ variant: v })}
+            columns={4}
+            capitalize
+          />
         </div>
 
         {usesImage && (
@@ -257,22 +312,14 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
               </div>
             </div>
             {comp.variant === "split" && comp.template !== "C" && (
-              <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-                {(["image-first", "title-first"] as SplitOrder[]).map((o) => (
-                  <button
-                    key={o}
-                    onClick={() => update({ splitOrder: o })}
-                    className={cn(
-                      "rounded-md py-1 text-xs font-medium transition-colors",
-                      comp.splitOrder === o
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {o === "image-first" ? "Image first" : "Title first"}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={["image-first", "title-first"] as SplitOrder[]}
+                value={comp.splitOrder}
+                onChange={(o) => update({ splitOrder: o })}
+                columns={2}
+                size="sm"
+                getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
+              />
             )}
           </div>
         )}
@@ -346,38 +393,27 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
 
       <Section title="Colors">
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label className="text-xs">Background</Label>
-            <input
-              type="color"
-              value={comp.background}
-              onChange={(e) => update({ background: e.target.value })}
-              className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs">Title</Label>
-            <input
-              type="color"
-              value={comp.titleColor}
-              onChange={(e) => update({ titleColor: e.target.value })}
-              className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
-            />
-          </div>
+          <ColorField
+            label="Background"
+            value={comp.background}
+            onChange={(v) => update({ background: v })}
+          />
+          <ColorField
+            label="Title"
+            value={comp.titleColor}
+            onChange={(v) => update({ titleColor: v })}
+          />
           {TEMPLATE_CAPTIONS[comp.template].map((slot) => (
-            <div key={slot.key} className="space-y-1.5">
-              <Label className="text-xs">{slot.label} color</Label>
-              <input
-                type="color"
-                value={comp.captionColors[slot.key as CaptionKey]}
-                onChange={(e) =>
-                  update({
-                    captionColors: { ...comp.captionColors, [slot.key]: e.target.value },
-                  })
-                }
-                className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
-              />
-            </div>
+            <ColorField
+              key={slot.key}
+              label={`${slot.label} color`}
+              value={comp.captionColors[slot.key as CaptionKey]}
+              onChange={(v) =>
+                update({
+                  captionColors: { ...comp.captionColors, [slot.key]: v },
+                })
+              }
+            />
           ))}
         </div>
       </Section>
@@ -386,43 +422,19 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Mode</Label>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <span className="block">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      disabled={comp.titleMode === "mixed"}
-                      onClick={() => update({ titleSeed: newSeed() })}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </span>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {comp.titleMode === "mixed" ? "No randomness in Mixed mode" : "Reroll type"}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <RerollButton
+              disabled={comp.titleMode === "mixed"}
+              onClick={() => update({ titleSeed: newSeed() })}
+              tooltip={comp.titleMode === "mixed" ? "No randomness in Mixed mode" : "Reroll type"}
+            />
           </div>
-          <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
-            {MODES.map((m) => (
-              <button
-                key={m}
-                onClick={() => update({ titleMode: m, titleSeed: newSeed() })}
-                className={cn(
-                  "rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
-                  comp.titleMode === m
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={MODES}
+            value={comp.titleMode}
+            onChange={(m) => update({ titleMode: m, titleSeed: newSeed() })}
+            columns={3}
+            capitalize
+          />
         </div>
 
         {comp.template === "D" ? (
@@ -510,26 +522,11 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
           <div className="flex items-center justify-between pt-3">
             <Label className="text-xs">Shift lines</Label>
             <div className="flex items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="block">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        disabled={!comp.titleShift}
-                        onClick={() => update({ titleShiftSeed: newSeed() })}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {comp.titleShift ? "Reroll shift" : "Turn shift on to reroll"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <RerollButton
+                disabled={!comp.titleShift}
+                onClick={() => update({ titleShiftSeed: newSeed() })}
+                tooltip={comp.titleShift ? "Reroll shift" : "Turn shift on to reroll"}
+              />
               <Switch
                 checked={comp.titleShift}
                 onCheckedChange={(v) =>
