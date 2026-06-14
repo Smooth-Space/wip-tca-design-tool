@@ -50,13 +50,54 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
 export function ControlPanel({ comp, setComp }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
+  const multiFileRef = useRef<HTMLInputElement>(null);
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    update({ images: [{ id: comp.images[0]?.id ?? crypto.randomUUID(), src: url }] });
+    const img = new Image();
+    img.onload = () => {
+      update({
+        images: [
+          {
+            id: comp.images[0]?.id ?? crypto.randomUUID(),
+            src: url,
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight,
+          },
+        ],
+      });
+    };
+    img.src = url;
     e.target.value = "";
+  };
+
+  const onUploadMulti = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    e.target.value = "";
+    Promise.all(
+      files.map(
+        (file) =>
+          new Promise<{ id: string; src: string; naturalWidth: number; naturalHeight: number }>(
+            (resolve) => {
+              const url = URL.createObjectURL(file);
+              const img = new Image();
+              img.onload = () =>
+                resolve({
+                  id: crypto.randomUUID(),
+                  src: url,
+                  naturalWidth: img.naturalWidth,
+                  naturalHeight: img.naturalHeight,
+                });
+              img.src = url;
+            },
+          ),
+      ),
+    ).then((items) => {
+      setComp((c) => ({ ...c, images: [...c.images, ...items].slice(0, 6) }));
+    });
   };
 
   return (
