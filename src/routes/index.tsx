@@ -87,7 +87,7 @@ function Composer() {
           ) {
             restored.globeScale = 1.0;
           } else {
-            restored.globeScale = Math.min(1.5, Math.max(0.5, restored.globeScale));
+            restored.globeScale = Math.min(2.0, Math.max(1.0, restored.globeScale));
           }
           delete (restored as unknown as Record<string, unknown>).titleShiftOffsets;
           setComp(restored);
