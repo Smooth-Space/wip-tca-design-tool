@@ -227,101 +227,59 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
       <h1 className="text-lg font-semibold">Composer</h1>
 
       <Section title="Format">
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
-          {FORMATS.map((f) => (
-            <button
-              key={f}
-              onClick={() => update({ format: f })}
-              className={cn(
-                "rounded-md py-1.5 text-sm font-medium transition-colors",
-                comp.format === f
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={FORMATS}
+          value={comp.format}
+          onChange={(f) => update({ format: f })}
+          columns={3}
+        />
       </Section>
 
       <Section title="Template">
-        <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
-          {TEMPLATES.map((t) => (
-            <button
-              key={t}
-              onClick={() =>
-                setComp((c) => {
-                  let titles = c.titles;
-                  if (t === "D" && titles.length < 2) {
-                    const defaults = ["Title one", "Title two"];
-                    titles = [...titles];
-                    while (titles.length < 2) {
-                      titles.push({
-                        id: crypto.randomUUID(),
-                        text: defaults[titles.length] ?? "New title",
-                      });
-                    }
-                  }
-                  return {
-                    ...c,
-                    template: t,
-                    titles,
-                    variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
-                  };
-                })
+        <SegmentedControl
+          options={TEMPLATES}
+          value={comp.template}
+          columns={4}
+          onChange={(t) =>
+            setComp((c) => {
+              let titles = c.titles;
+              if (t === "D" && titles.length < 2) {
+                const defaults = ["Title one", "Title two"];
+                titles = [...titles];
+                while (titles.length < 2) {
+                  titles.push({
+                    id: crypto.randomUUID(),
+                    text: defaults[titles.length] ?? "New title",
+                  });
+                }
               }
-              className={cn(
-                "rounded-md py-1.5 text-sm font-medium transition-colors",
-                comp.template === t
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {t}
-            </button>
-          ))}
-        </div>
+              return {
+                ...c,
+                template: t,
+                titles,
+                variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
+              };
+            })
+          }
+        />
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Variant</Label>
             {comp.variant === "multi" && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="block">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => update({ multiSeed: newSeed() })}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>Reroll layout</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <RerollButton
+                onClick={() => update({ multiSeed: newSeed() })}
+                tooltip="Reroll layout"
+              />
             )}
           </div>
-          <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
-            {TEMPLATE_VARIANTS[comp.template].map((v) => (
-              <button
-                key={v}
-                onClick={() => update({ variant: v })}
-                className={cn(
-                  "rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
-                  comp.variant === v
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                {v}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={TEMPLATE_VARIANTS[comp.template]}
+            value={comp.variant}
+            onChange={(v) => update({ variant: v })}
+            columns={4}
+            capitalize
+          />
         </div>
 
         {usesImage && (
