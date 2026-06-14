@@ -11,12 +11,7 @@ interface TitleBlockProps {
 }
 
 export function TitleBlock({ titles, titleMode, titleSeed, titleSizePx, titleColor }: TitleBlockProps) {
-  // Apply casing in JS (not CSS text-transform) so the character STREAM matches
-  // exactly what is displayed — keeps axis indices in sync with the glyphs.
-  const rows = useMemo(
-    () => titles.map((t) => (t.case === "upper" ? t.text.toUpperCase() : t.text)),
-    [titles],
-  );
+  const rows = useMemo(() => titles.map((t) => t.text), [titles]);
 
   // One flat stream across ALL rows; axes computed once.
   const axes = useMemo(() => {
@@ -43,7 +38,7 @@ export function TitleBlock({ titles, titleMode, titleSeed, titleSizePx, titleCol
         fontFamily: "'ABC Arizona Plus Variable'",
         fontSize: titleSizePx,
         letterSpacing: "-0.02em",
-        color,
+        color: titleColor,
       }}
     >
       {rows.map((row, r) => {
