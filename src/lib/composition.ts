@@ -1,6 +1,6 @@
 export type Format = "1:1" | "4:5" | "9:16";
 export type Mode = "light" | "mixed" | "heavy";
-export type Variant = "none" | "split" | "full";
+export type Variant = "none" | "split" | "full" | "multi";
 export type SplitOrder = "image-first" | "title-first";
 
 export const PLACEHOLDER_SRC = "/placeholder.jpg";
@@ -13,6 +13,8 @@ export interface Title {
 export interface ImageItem {
   id: string;
   src: string;
+  naturalWidth: number;
+  naturalHeight: number;
 }
 
 export interface Composition {
@@ -27,6 +29,7 @@ export interface Composition {
   titleSeed: number;
   images: ImageItem[];
   splitOrder: SplitOrder;
+  multiSeed: number;
   info: { text1: string; text2: string };
 }
 
@@ -42,5 +45,6 @@ export const defaultComposition: Composition = {
   titleSeed: (Math.random() * 0xffffffff) >>> 0,
   images: [],
   splitOrder: "image-first",
+  multiSeed: (Math.random() * 0xffffffff) >>> 0,
   info: { text1: "Text 1", text2: "Text 2" },
 };
