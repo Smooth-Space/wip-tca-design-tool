@@ -477,6 +477,7 @@ export function Canvas({
             captions={comp.captions}
             captionColors={comp.captionColors}
             gap={40}
+            inset={inset}
           >
             <div style={{ position: "absolute", inset: 0 }}>
               {coverImg}
@@ -512,7 +513,7 @@ export function Canvas({
       );
       return (
         <div style={{ position: "absolute", inset: 0 }}>
-          <TemplateLayout slots={slots} captions={comp.captions} captionColors={comp.captionColors} gap={40}>
+          <TemplateLayout slots={slots} captions={comp.captions} captionColors={comp.captionColors} gap={40} inset={inset}>
             {middle}
           </TemplateLayout>
         </div>
@@ -566,7 +567,7 @@ export function Canvas({
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>{imageLayer}</div>
         )}
         <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
-          <TemplateLayout slots={slots} captions={comp.captions} captionColors={comp.captionColors} gap={comp.template === "B" ? 40 : 0}>
+          <TemplateLayout slots={slots} captions={comp.captions} captionColors={comp.captionColors} gap={comp.template === "B" ? 40 : 0} inset={inset}>
             {centeredTitle}
           </TemplateLayout>
         </div>
