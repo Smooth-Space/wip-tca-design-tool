@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import * as THREE from "three";
 import gsap from "gsap";
 import type { ImageItem } from "@/lib/composition";
@@ -34,15 +34,14 @@ function fibonacciSphere(n: number): THREE.Vector3[] {
   return pts;
 }
 
-export function MultiSphere({
-  images,
-  w,
-  h,
-  imageOverlay,
-  animSeed,
-  playing,
-  globeScale,
-}: {
+export type MultiSphereHandle = {
+  durationSec: () => number;
+  seekAndRender: (t: number) => void;
+  getCanvas: () => HTMLCanvasElement | null;
+  setExporting: (b: boolean) => void;
+};
+
+type Props = {
   images: ImageItem[];
   w: number;
   h: number;
@@ -50,11 +49,37 @@ export function MultiSphere({
   animSeed: number;
   playing: boolean;
   globeScale: number;
-}) {
+};
+
+export const MultiSphere = forwardRef<MultiSphereHandle, Props>(function MultiSphere(
+  { images, w, h, imageOverlay, animSeed, playing, globeScale },
+  ref,
+) {
   const mountRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const groupRef = useRef<THREE.Group | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const seekRef = useRef<(t: number) => void>(() => {});
+  const canvasElRef = useRef<HTMLCanvasElement | null>(null);
+  const exportingRef = useRef(false);
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      durationSec: () => tlRef.current?.duration() ?? 0,
+      seekAndRender: (t) => seekRef.current(t),
+      getCanvas: () => canvasElRef.current,
+      setExporting: (b) => {
+        exportingRef.current = b;
+        const tl = tlRef.current;
+        if (b) tl?.pause();
+        else if (playingRef.current) tl?.resume();
+      },
+    }),
+    [],
+  );
 
   // Build scene whenever inputs that affect geometry/textures change.
   useEffect(() => {
@@ -71,12 +96,17 @@ export function MultiSphere({
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      preserveDrawingBuffer: true,
+    });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(w, h, false);
     const maxAniso = renderer.capabilities.getMaxAnisotropy();
     renderer.setClearColor(0x000000, 0);
     const canvas = renderer.domElement;
+    canvasElRef.current = canvas;
     canvas.style.width = `${w}px`;
     canvas.style.height = `${h}px`;
     mount.appendChild(canvas);
@@ -209,15 +239,26 @@ export function MultiSphere({
     let raf = 0;
     const tmpQ = new THREE.Quaternion();
     const parentQ = new THREE.Quaternion();
-    const render = () => {
+    const renderFrame = () => {
       // Billboard: each tile faces the camera, accounting for tilt + spin.
       camera.getWorldQuaternion(tmpQ);
       tiltGroup.getWorldQuaternion(parentQ);
       for (const t of tiles) t.quaternion.copy(parentQ).invert().multiply(tmpQ);
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(render);
     };
-    raf = requestAnimationFrame(render);
+    seekRef.current = (t: number) => {
+      const tl = tlRef.current;
+      if (tl) {
+        tl.pause();
+        tl.time(t);
+      }
+      renderFrame(); // synchronous: seek → billboard → render
+    };
+    const loop = () => {
+      if (!exportingRef.current) renderFrame(); // idle live loop during export
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -225,6 +266,8 @@ export function MultiSphere({
       tlRef.current = null;
       groupRef.current = null;
       cameraRef.current = null;
+      seekRef.current = () => {};
+      canvasElRef.current = null;
       geoms.forEach((g) => g.dispose());
       textures.forEach((t) => t.dispose());
       tiles.forEach((t) => {
@@ -258,7 +301,8 @@ export function MultiSphere({
   return (
     <div
       ref={mountRef}
+      data-globe="true"
       style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
     />
   );
-}
+});

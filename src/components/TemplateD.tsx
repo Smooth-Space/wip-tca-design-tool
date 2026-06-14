@@ -5,18 +5,20 @@ import { computeMultiLayout } from "@/lib/multiLayout";
 import { TitleLine } from "@/components/TitleLine";
 import { Caption } from "@/components/Caption";
 import { CoverImage, MultiImages, Overlay } from "@/components/ImageLayers";
-import { MultiSphere } from "@/components/MultiSphere";
+import { MultiSphere, type MultiSphereHandle } from "@/components/MultiSphere";
 
 export function TemplateD({
   comp,
   w,
   h,
   imgSrc,
+  sphereRef,
 }: {
   comp: Composition;
   w: number;
   h: number;
   imgSrc: string;
+  sphereRef?: React.Ref<MultiSphereHandle>;
 }) {
   const dRows = useMemo(
     () => [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""],
@@ -45,6 +47,7 @@ export function TemplateD({
         <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
           {comp.animate ? (
             <MultiSphere
+              ref={sphereRef}
               images={comp.images}
               w={w}
               h={h}
