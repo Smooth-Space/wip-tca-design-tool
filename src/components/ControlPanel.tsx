@@ -312,22 +312,14 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
               </div>
             </div>
             {comp.variant === "split" && comp.template !== "C" && (
-              <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
-                {(["image-first", "title-first"] as SplitOrder[]).map((o) => (
-                  <button
-                    key={o}
-                    onClick={() => update({ splitOrder: o })}
-                    className={cn(
-                      "rounded-md py-1 text-xs font-medium transition-colors",
-                      comp.splitOrder === o
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground",
-                    )}
-                  >
-                    {o === "image-first" ? "Image first" : "Title first"}
-                  </button>
-                ))}
-              </div>
+              <SegmentedControl
+                options={["image-first", "title-first"] as SplitOrder[]}
+                value={comp.splitOrder}
+                onChange={(o) => update({ splitOrder: o })}
+                columns={2}
+                size="sm"
+                getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
+              />
             )}
           </div>
         )}
