@@ -108,16 +108,30 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
       <h1 className="text-lg font-semibold">Composer</h1>
 
       <Section title="Template">
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+        <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
           {TEMPLATES.map((t) => (
             <button
               key={t}
               onClick={() =>
-                setComp((c) => ({
-                  ...c,
-                  template: t,
-                  variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
-                }))
+                setComp((c) => {
+                  let titles = c.titles;
+                  if (t === "D" && titles.length < 2) {
+                    const defaults = ["Title one", "Title two"];
+                    titles = [...titles];
+                    while (titles.length < 2) {
+                      titles.push({
+                        id: crypto.randomUUID(),
+                        text: defaults[titles.length] ?? "New title",
+                      });
+                    }
+                  }
+                  return {
+                    ...c,
+                    template: t,
+                    titles,
+                    variant: TEMPLATE_VARIANTS[t].includes(c.variant) ? c.variant : "none",
+                  };
+                })
               }
               className={cn(
                 "rounded-md py-1.5 text-sm font-medium transition-colors",
