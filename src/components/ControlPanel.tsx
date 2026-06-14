@@ -1,4 +1,4 @@
-import type { Composition, Format, Mode, TitleCase, Variant, SplitOrder } from "@/lib/composition";
+import type { Composition, Format, Mode, Variant, SplitOrder } from "@/lib/composition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
