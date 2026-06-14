@@ -266,7 +266,7 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
               onChange={onUploadMulti}
               className="hidden"
             />
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -276,9 +276,21 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
               >
                 <Plus className="mr-1 h-4 w-4" /> Add images
               </Button>
-              <Button variant="outline" size="sm" onClick={() => update({ multiSeed: newSeed() })}>
-                <Shuffle className="mr-1 h-4 w-4" /> Reroll layout
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 shrink-0"
+                      onClick={() => update({ multiSeed: newSeed() })}
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Reroll layout</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             {comp.images.length > 0 && (
               <div className="space-y-2">
