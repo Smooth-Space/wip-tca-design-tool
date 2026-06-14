@@ -48,6 +48,22 @@ export const TEMPLATE_VARIANTS: Record<Template, Variant[]> = {
 
 export const PLACEHOLDER_SRC = lagunaGloriaAsset.url;
 
+export interface TextInset {
+  top: number;
+  bottom: number;
+  left: number;
+  right: number;
+}
+
+const DEFAULT_INSET: TextInset = { top: 40, bottom: 40, left: 40, right: 40 };
+const SAFE_INSET: TextInset = { top: 250, bottom: 480, left: 40, right: 120 };
+
+// Text-only safe area. Only 9:16 has app chrome; other formats are unaffected.
+export function getTextInset(comp: Composition): TextInset {
+  if (comp.format === "9:16" && comp.socialSafe !== "off") return SAFE_INSET;
+  return DEFAULT_INSET;
+}
+
 export interface Title {
   id: string;
   text: string;
