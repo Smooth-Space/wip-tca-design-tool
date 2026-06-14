@@ -77,14 +77,12 @@ function TemplateD({
   h,
   imgSrc,
   coverImg,
-  multiPlacements,
 }: {
   comp: Composition;
   w: number;
   h: number;
   imgSrc: string;
   coverImg: React.ReactNode;
-  multiPlacements: ReturnType<typeof computeMultiLayout>;
 }) {
   const dRows = useMemo(
     () => [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""],
@@ -95,6 +93,11 @@ function TemplateD({
     [dRows, comp.titleMode, comp.titleSeed],
   );
   const bottomOffset = Array.from(dRows[0]).length;
+
+  const multiPlacements = useMemo(
+    () => computeMultiLayout(comp.images, w, h, 2, comp.titleSizePx, comp.multiSeed),
+    [comp.images, w, h, comp.titleSizePx, comp.multiSeed],
+  );
 
   const caption = (text: string) => (
     <div
