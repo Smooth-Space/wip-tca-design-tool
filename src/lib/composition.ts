@@ -1,5 +1,4 @@
 export type Format = "1:1" | "4:5" | "9:16";
-export type TitleCase = "upper" | "sentence";
 export type Mode = "light" | "mixed" | "heavy";
 export type Variant = "none" | "split" | "full";
 export type SplitOrder = "image-first" | "title-first";
