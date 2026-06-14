@@ -1,4 +1,4 @@
-export interface ImgAspect { id: string; naturalWidth: number; naturalHeight: number; }
+export interface ImgAspect { id: string; naturalWidth: number; naturalHeight: number; src?: string; }
 export interface Placement { id: string; x: number; y: number; width: number; height: number; }
 
 const P = {
