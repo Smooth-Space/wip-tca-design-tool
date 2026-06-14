@@ -80,13 +80,110 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
   );
 }
 
+const GRID_COLS: Record<number, string> = {
+  2: "grid-cols-2",
+  3: "grid-cols-3",
+  4: "grid-cols-4",
+};
+
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+  columns,
+  getLabel,
+  size = "md",
+  capitalize = false,
+}: {
+  options: readonly T[];
+  value: T;
+  onChange: (v: T) => void;
+  columns: number;
+  getLabel?: (v: T) => string;
+  size?: "sm" | "md";
+  capitalize?: boolean;
+}) {
+  return (
+    <div className={cn("grid gap-1 rounded-lg bg-muted p-1", GRID_COLS[columns])}>
+      {options.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChange(o)}
+          className={cn(
+            "rounded-md font-medium transition-colors",
+            size === "sm" ? "py-1 text-xs" : "py-1.5 text-sm",
+            capitalize && "capitalize",
+            value === o
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {getLabel ? getLabel(o) : o}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function RerollButton({
+  onClick,
+  disabled,
+  tooltip,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  tooltip: string;
+}) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="block">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              disabled={disabled}
+              onClick={onClick}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>{tooltip}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs">{label}</Label>
+      <input
+        type="color"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
+      />
+    </div>
+  );
+}
+
 export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
 
-  const usesImage =
-    comp.variant === "split" || comp.variant === "full" || comp.variant === "inset";
+  const usesImage = comp.variant === "split" || comp.variant === "full";
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
