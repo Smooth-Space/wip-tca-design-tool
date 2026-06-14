@@ -1,4 +1,4 @@
-import { PLACEHOLDER_SRC, TEMPLATE_CAPTIONS, type Composition } from "@/lib/composition";
+import { PLACEHOLDER_SRC, TEMPLATE_CAPTIONS, getTextInset, type Composition, type TextInset } from "@/lib/composition";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TitleBlock } from "@/components/TitleBlock";
 import { TemplateLayout } from "@/components/TemplateLayout";
@@ -77,12 +77,14 @@ function TemplateD({
   h,
   imgSrc,
   coverImg,
+  inset,
 }: {
   comp: Composition;
   w: number;
   h: number;
   imgSrc: string;
   coverImg: React.ReactNode;
+  inset: TextInset;
 }) {
   const dRows = useMemo(
     () => [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""],
@@ -156,7 +158,10 @@ function TemplateD({
           position: "absolute",
           inset: 0,
           zIndex: 1,
-          padding: 40,
+          paddingTop: inset.top,
+          paddingBottom: inset.bottom,
+          paddingLeft: inset.left,
+          paddingRight: inset.right,
           display: "flex",
           flexDirection: "column",
           gap: 40,
