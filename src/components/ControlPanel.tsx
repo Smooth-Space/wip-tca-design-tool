@@ -124,7 +124,7 @@ export function ControlPanel({ comp, setComp }: Props) {
       </Section>
 
       <Section title="Variant">
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+        <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
           {VARIANTS.map((v) => (
             <button
               key={v}
