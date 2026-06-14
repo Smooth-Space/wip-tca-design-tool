@@ -85,6 +85,7 @@ export function computeMultiLayout(
   titleRows: number,
   titleSizePx: number,
   seed: number,
+  bandHeightOverride?: number,
 ): Placement[] {
   const imgs = images.slice(0, 3);
   if (imgs.length === 0) return [];
@@ -92,11 +93,13 @@ export function computeMultiLayout(
   const longRef = Math.max(W, H);
 
   // central keep-clear band (scales with the title)
-  const bandH = clamp(
-    titleRows * titleSizePx * 0.9 + P.bandMargin * H,
-    P.bandMinFrac * H,
-    P.bandMaxFrac * H,
-  );
+  const bandH = bandHeightOverride !== undefined
+    ? bandHeightOverride
+    : clamp(
+        titleRows * titleSizePx * 0.9 + P.bandMargin * H,
+        P.bandMinFrac * H,
+        P.bandMaxFrac * H,
+      );
   const bandTop = (H - bandH) / 2;
   const bandBottom = bandTop + bandH;
   const topMid = bandTop / 2;
