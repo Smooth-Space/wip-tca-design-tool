@@ -192,6 +192,59 @@ export function ControlPanel({ comp, setComp }: Props) {
         </Section>
       )}
 
+      {comp.variant === "multi" && (
+        <Section title="Images">
+          <input
+            ref={multiFileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={onUploadMulti}
+            className="hidden"
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              disabled={comp.images.length >= 6}
+              onClick={() => multiFileRef.current?.click()}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add images
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => update({ multiSeed: newSeed() })}>
+              <Shuffle className="mr-1 h-4 w-4" /> Reroll layout
+            </Button>
+          </div>
+          {comp.images.length > 0 && (
+            <div className="space-y-2">
+              {comp.images.map((im, i) => (
+                <div key={im.id} className="flex items-center gap-2">
+                  <img
+                    src={im.src}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
+                  />
+                  <span className="flex-1 text-xs text-muted-foreground">
+                    {i < 3 ? `Shown ${i + 1}` : "Stored (not shown)"}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() =>
+                      update({ images: comp.images.filter((x) => x.id !== im.id) })
+                    }
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
+
       <Section title="Colors">
         <div className="grid grid-cols-3 gap-3">
           <div className="space-y-1.5">
