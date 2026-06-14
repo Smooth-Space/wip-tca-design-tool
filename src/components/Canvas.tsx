@@ -99,7 +99,18 @@ function TemplateD({
     [comp.images, w, h, comp.titleSizePx, comp.multiSeed],
   );
 
-  const caption = (text: string, align: "left" | "right" = "left") => (
+  const overlay = (style: React.CSSProperties) =>
+    comp.imageOverlay > 0 ? (
+      <div
+        style={{ position: "absolute", background: "#000", opacity: comp.imageOverlay, ...style }}
+      />
+    ) : null;
+
+  const caption = (
+    text: string,
+    color: string,
+    align: "left" | "right" = "left",
+  ) => (
     <div
       style={{
         flex: 1,
@@ -109,7 +120,7 @@ function TemplateD({
         fontFamily: "'ABC Arizona Plus Variable'",
         fontSize: 36,
         lineHeight: 1.1,
-        color: comp.textColor,
+        color,
         fontVariationSettings: "'wght' 400, 'SRFF' 0, 'wdth' 100",
       }}
     >
@@ -120,25 +131,22 @@ function TemplateD({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       {comp.variant === "full" && (
-        <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>{coverImg}</div>
+        <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+          {coverImg}
+          {overlay({ inset: 0 })}
+        </div>
       )}
       {comp.variant === "multi" && (
         <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
           {multiPlacements.map((p) => (
-            <img
-              key={p.id}
-              src={comp.images.find((im) => im.id === p.id)?.src}
-              alt=""
-              style={{
-                position: "absolute",
-                left: p.x,
-                top: p.y,
-                width: p.width,
-                height: p.height,
-                objectFit: "cover",
-                display: "block",
-              }}
-            />
+            <div key={p.id} style={{ position: "absolute", left: p.x, top: p.y, width: p.width, height: p.height }}>
+              <img
+                src={comp.images.find((im) => im.id === p.id)?.src}
+                alt=""
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+              {overlay({ inset: 0 })}
+            </div>
           ))}
         </div>
       )}
@@ -176,6 +184,7 @@ function TemplateD({
                   display: "block",
                 }}
               />
+              {overlay({ inset: 0 })}
             </div>
           )}
           <div
@@ -187,8 +196,8 @@ function TemplateD({
               alignItems: "center",
             }}
           >
-            {caption(comp.captions.text1, "left")}
-            {caption(comp.captions.text2, "right")}
+            {caption(comp.captions.text1, comp.captionColors.text1, "left")}
+            {caption(comp.captions.text2, comp.captionColors.text2, "right")}
           </div>
         </div>
 
