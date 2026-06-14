@@ -112,6 +112,66 @@ export function Canvas({ comp }: { comp: Composition }) {
       );
     }
 
+    if (comp.variant === "multi") {
+      return (
+        <div style={{ position: "absolute", inset: 0 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+            {multiPlacements.map((p) => (
+              <img
+                key={p.id}
+                src={comp.images.find((im) => im.id === p.id)?.src}
+                alt=""
+                style={{
+                  position: "absolute",
+                  left: p.x,
+                  top: p.y,
+                  width: p.width,
+                  height: p.height,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            ))}
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
+              padding: 40,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <div className="flex flex-1 flex-col justify-center">{title}</div>
+            {infoRow}
+          </div>
+        </div>
+      );
+    }
+
+    if (false) {
+      return (
+        <div style={{ position: "absolute", inset: 0 }}>
+          <div style={{ position: "absolute", inset: 0 }}>{coverImg}</div>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              padding: 40,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <div className="flex flex-1 flex-col justify-center">{title}</div>
+            {infoRow}
+          </div>
+        </div>
+      );
+    }
+
     if (comp.variant === "split") {
       const imageTop = comp.splitOrder === "image-first";
       const imageHalf = (
