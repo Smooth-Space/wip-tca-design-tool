@@ -17,7 +17,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
-const VARIANTS: Variant[] = ["none", "split", "full"];
+const VARIANTS: Variant[] = ["none", "split", "full", "multi"];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -50,13 +50,54 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
 export function ControlPanel({ comp, setComp }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
+  const multiFileRef = useRef<HTMLInputElement>(null);
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
-    update({ images: [{ id: comp.images[0]?.id ?? crypto.randomUUID(), src: url }] });
+    const img = new Image();
+    img.onload = () => {
+      update({
+        images: [
+          {
+            id: comp.images[0]?.id ?? crypto.randomUUID(),
+            src: url,
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight,
+          },
+        ],
+      });
+    };
+    img.src = url;
     e.target.value = "";
+  };
+
+  const onUploadMulti = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    e.target.value = "";
+    Promise.all(
+      files.map(
+        (file) =>
+          new Promise<{ id: string; src: string; naturalWidth: number; naturalHeight: number }>(
+            (resolve) => {
+              const url = URL.createObjectURL(file);
+              const img = new Image();
+              img.onload = () =>
+                resolve({
+                  id: crypto.randomUUID(),
+                  src: url,
+                  naturalWidth: img.naturalWidth,
+                  naturalHeight: img.naturalHeight,
+                });
+              img.src = url;
+            },
+          ),
+      ),
+    ).then((items) => {
+      setComp((c) => ({ ...c, images: [...c.images, ...items].slice(0, 6) }));
+    });
   };
 
   return (
@@ -83,7 +124,7 @@ export function ControlPanel({ comp, setComp }: Props) {
       </Section>
 
       <Section title="Variant">
-        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+        <div className="grid grid-cols-4 gap-1 rounded-lg bg-muted p-1">
           {VARIANTS.map((v) => (
             <button
               key={v}
@@ -145,6 +186,59 @@ export function ControlPanel({ comp, setComp }: Props) {
                 >
                   {o === "image-first" ? "Image first" : "Title first"}
                 </button>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
+
+      {comp.variant === "multi" && (
+        <Section title="Images">
+          <input
+            ref={multiFileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={onUploadMulti}
+            className="hidden"
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              disabled={comp.images.length >= 6}
+              onClick={() => multiFileRef.current?.click()}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add images
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => update({ multiSeed: newSeed() })}>
+              <Shuffle className="mr-1 h-4 w-4" /> Reroll layout
+            </Button>
+          </div>
+          {comp.images.length > 0 && (
+            <div className="space-y-2">
+              {comp.images.map((im, i) => (
+                <div key={im.id} className="flex items-center gap-2">
+                  <img
+                    src={im.src}
+                    alt=""
+                    className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
+                  />
+                  <span className="flex-1 text-xs text-muted-foreground">
+                    {i < 3 ? `Shown ${i + 1}` : "Stored (not shown)"}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={() =>
+                      update({ images: comp.images.filter((x) => x.id !== im.id) })
+                    }
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               ))}
             </div>
           )}

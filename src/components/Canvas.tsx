@@ -1,6 +1,7 @@
 import { PLACEHOLDER_SRC, type Composition } from "@/lib/composition";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TitleBlock } from "@/components/TitleBlock";
+import { computeMultiLayout } from "@/lib/multiLayout";
 
 const FORMAT_DIMENSIONS: Record<Composition["format"], { w: number; h: number }> = {
   "1:1": { w: 1080, h: 1080 },
@@ -13,6 +14,19 @@ export function Canvas({ comp }: { comp: Composition }) {
   const [scale, setScale] = useState(1);
   const { w, h } = FORMAT_DIMENSIONS[comp.format];
   const imgSrc = comp.images[0]?.src ?? PLACEHOLDER_SRC;
+
+  const multiPlacements = useMemo(
+    () =>
+      computeMultiLayout(
+        comp.images,
+        w,
+        h,
+        comp.titles.length,
+        comp.titleSizePx,
+        comp.multiSeed,
+      ),
+    [comp.images, w, h, comp.titles.length, comp.titleSizePx, comp.multiSeed],
+  );
 
   useEffect(() => {
     const el = containerRef.current;
@@ -85,6 +99,45 @@ export function Canvas({ comp }: { comp: Composition }) {
             style={{
               position: "absolute",
               inset: 0,
+              padding: 40,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <div className="flex flex-1 flex-col justify-center">{title}</div>
+            {infoRow}
+          </div>
+        </div>
+      );
+    }
+
+    if (comp.variant === "multi") {
+      return (
+        <div style={{ position: "absolute", inset: 0 }}>
+          <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+            {multiPlacements.map((p) => (
+              <img
+                key={p.id}
+                src={comp.images.find((im) => im.id === p.id)?.src}
+                alt=""
+                style={{
+                  position: "absolute",
+                  left: p.x,
+                  top: p.y,
+                  width: p.width,
+                  height: p.height,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            ))}
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 1,
               padding: 40,
               display: "flex",
               flexDirection: "column",
