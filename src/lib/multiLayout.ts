@@ -25,7 +25,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 function sizeFor(im: ImgAspect, frac: number, longRef: number) {
   const box = frac * longRef;
-  const ar = im.naturalWidth / im.naturalHeight;
+  const ar = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
   return ar >= 1 ? { w: box, h: box / ar } : { w: box * ar, h: box };
 }
 function szFrac(base: number, rng: () => number) {
