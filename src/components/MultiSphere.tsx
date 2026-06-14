@@ -137,10 +137,20 @@ export function MultiSphere({
 
       let material: THREE.Material;
       if (srcs.length > 0) {
-        const tex = loader.load(srcs[i % srcs.length]);
+        const tex = loader.load(srcs[i % srcs.length], (t) => {
+          t.needsUpdate = true;
+        });
         tex.colorSpace = THREE.SRGBColorSpace;
+        tex.generateMipmaps = true;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.anisotropy = maxAniso;
         textures.push(tex);
-        material = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+        material = new THREE.MeshBasicMaterial({
+          map: tex,
+          side: THREE.DoubleSide,
+          toneMapped: false,
+        });
       } else {
         material = new THREE.MeshBasicMaterial({ color: 0x888888, side: THREE.DoubleSide });
       }
