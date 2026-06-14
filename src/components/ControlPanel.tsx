@@ -1,5 +1,5 @@
 import type { Composition, Format, Mode, Template, SplitOrder, CaptionKey } from "@/lib/composition";
-import { TEMPLATE_CAPTIONS, TEMPLATE_VARIANTS } from "@/lib/composition";
+import { TEMPLATE_CAPTIONS, TEMPLATE_VARIANTS, PLACEHOLDER_SRC } from "@/lib/composition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
