@@ -13,6 +13,8 @@ import { useRef } from "react";
 interface Props {
   comp: Composition;
   setComp: React.Dispatch<React.SetStateAction<Composition>>;
+  onExport: () => void;
+  exporting: boolean;
 }
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
@@ -47,7 +49,7 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
   );
 }
 
-export function ControlPanel({ comp, setComp }: Props) {
+export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
@@ -393,6 +395,12 @@ export function ControlPanel({ comp, setComp }: Props) {
             className="resize-none"
           />
         </div>
+      </Section>
+
+      <Section title="Export">
+        <Button className="w-full" onClick={onExport} disabled={exporting}>
+          {exporting ? "Exporting…" : "Export JPG"}
+        </Button>
       </Section>
     </aside>
   );
