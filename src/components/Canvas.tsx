@@ -5,6 +5,7 @@ import { computeMultiLayout } from "@/lib/multiLayout";
 import { TemplateA } from "@/components/TemplateA";
 import { TemplateBC } from "@/components/TemplateBC";
 import { TemplateD } from "@/components/TemplateD";
+import type { MultiSphereHandle } from "@/components/MultiSphere";
 
 const FORMAT_DIMENSIONS: Record<Composition["format"], { w: number; h: number }> = {
   "1:1": { w: 1080, h: 1080 },
@@ -15,9 +16,11 @@ const FORMAT_DIMENSIONS: Record<Composition["format"], { w: number; h: number }>
 export function Canvas({
   comp,
   compositionRef,
+  sphereRef,
 }: {
   comp: Composition;
   compositionRef?: React.Ref<HTMLDivElement>;
+  sphereRef?: React.Ref<MultiSphereHandle>;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -68,7 +71,7 @@ export function Canvas({
 
   const renderInner = () => {
     if (comp.template === "D") {
-      return <TemplateD comp={comp} w={w} h={h} imgSrc={imgSrc} />;
+      return <TemplateD comp={comp} w={w} h={h} imgSrc={imgSrc} sphereRef={sphereRef} />;
     }
     if (comp.template === "A") {
       return (
@@ -79,6 +82,7 @@ export function Canvas({
           imgSrc={imgSrc}
           title={title}
           multiPlacements={multiPlacements}
+          sphereRef={sphereRef}
         />
       );
     }
@@ -90,6 +94,7 @@ export function Canvas({
         imgSrc={imgSrc}
         title={title}
         multiPlacements={multiPlacements}
+        sphereRef={sphereRef}
       />
     );
   };
