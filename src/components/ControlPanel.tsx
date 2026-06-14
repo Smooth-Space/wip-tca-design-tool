@@ -27,6 +27,24 @@ const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
 const TEMPLATES: Template[] = ["A", "B", "C", "D"];
 
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function loadDimensions(src: string): Promise<{ naturalWidth: number; naturalHeight: number }> {
+  return new Promise((res) => {
+    const img = new Image();
+    img.onload = () => res({ naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight });
+    img.onerror = () => res({ naturalWidth: 0, naturalHeight: 0 });
+    img.src = src;
+  });
+}
+
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Collapsible defaultOpen className="rounded-lg border border-border bg-card">
