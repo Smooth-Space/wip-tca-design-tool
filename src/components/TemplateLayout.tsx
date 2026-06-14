@@ -65,11 +65,13 @@ export function TemplateLayout({
   slots,
   captions,
   textColor,
+  gap = 0,
   children,
 }: {
   slots: CaptionSlot[];
   captions: Captions;
   textColor: string;
+  gap?: number;
   children: React.ReactNode;
 }) {
   return (
@@ -80,6 +82,7 @@ export function TemplateLayout({
         padding: 40,
         display: "flex",
         flexDirection: "column",
+        gap,
       }}
     >
       <CaptionRow slots={slots} captions={captions} color={textColor} anchor="top" />
