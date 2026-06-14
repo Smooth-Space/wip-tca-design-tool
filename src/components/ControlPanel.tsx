@@ -362,6 +362,32 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
           </TooltipProvider>
         </div>
 
+        {comp.template === "D" ? (
+          <div className="space-y-2">
+            {[0, 1].map((idx) => {
+              const t = comp.titles[idx];
+              const label = idx === 0 ? "Title 1 (top)" : "Title 2 (bottom)";
+              return (
+                <div key={idx} className="space-y-1">
+                  <Label className="text-xs">{label}</Label>
+                  <Input
+                    value={t?.text ?? ""}
+                    onChange={(e) =>
+                      setComp((c) => {
+                        const titles = [...c.titles];
+                        while (titles.length < 2) {
+                          titles.push({ id: crypto.randomUUID(), text: "" });
+                        }
+                        titles[idx] = { ...titles[idx], text: e.target.value };
+                        return { ...c, titles };
+                      })
+                    }
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
         <div className="space-y-2">
           {comp.titles.map((t) => (
             <div key={t.id} className="flex items-center gap-2">
@@ -404,6 +430,7 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
             <Plus className="mr-1 h-4 w-4" /> Add title row
           </Button>
         </div>
+        )}
 
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between">
