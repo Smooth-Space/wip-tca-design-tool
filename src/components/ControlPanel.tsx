@@ -522,26 +522,11 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
           <div className="flex items-center justify-between pt-3">
             <Label className="text-xs">Shift lines</Label>
             <div className="flex items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="block">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        disabled={!comp.titleShift}
-                        onClick={() => update({ titleShiftSeed: newSeed() })}
-                      >
-                        <RefreshCw className="h-4 w-4" />
-                      </Button>
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {comp.titleShift ? "Reroll shift" : "Turn shift on to reroll"}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <RerollButton
+                disabled={!comp.titleShift}
+                onClick={() => update({ titleShiftSeed: newSeed() })}
+                tooltip={comp.titleShift ? "Reroll shift" : "Turn shift on to reroll"}
+              />
               <Switch
                 checked={comp.titleShift}
                 onCheckedChange={(v) =>
