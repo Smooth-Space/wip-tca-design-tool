@@ -23,6 +23,9 @@ interface Props {
   onExport: () => void;
   exporting: boolean;
   onReset: () => void;
+  onExportMp4?: () => void;
+  exportingMp4?: boolean;
+  mp4Progress?: number;
 }
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
@@ -178,7 +181,16 @@ function ColorField({
   );
 }
 
-export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Props) {
+export function ControlPanel({
+  comp,
+  setComp,
+  onExport,
+  exporting,
+  onReset,
+  onExportMp4,
+  exportingMp4,
+  mp4Progress,
+}: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
@@ -639,6 +651,13 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
         <Button className="w-full" onClick={onExport} disabled={exporting}>
           {exporting ? "Exporting…" : "Export JPG"}
         </Button>
+        {comp.variant === "multi" && comp.animate && (
+          <Button className="w-full" onClick={onExportMp4} disabled={exportingMp4}>
+            {exportingMp4
+              ? `Exporting MP4… ${Math.round((mp4Progress ?? 0) * 100)}%`
+              : "Export MP4"}
+          </Button>
+        )}
         <Button
           variant="outline"
           className="w-full"
