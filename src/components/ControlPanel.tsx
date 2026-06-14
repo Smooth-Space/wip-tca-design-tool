@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Plus, X, RefreshCw, ChevronDown } from "lucide-react";
+import { Plus, X, RefreshCw, ChevronDown, Play, Pause } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Collapsible,
@@ -369,6 +369,35 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
                 ))}
               </div>
             )}
+            <div className="flex items-center justify-between pt-1">
+              <Label className="text-xs">Animate</Label>
+              <div className="flex items-center gap-1">
+                {comp.animate && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => update({ animPlaying: !comp.animPlaying })}
+                    >
+                      {comp.animPlaying ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <RerollButton
+                      onClick={() => update({ animSeed: newSeed() })}
+                      tooltip="Reroll animation"
+                    />
+                  </>
+                )}
+                <Switch
+                  checked={comp.animate}
+                  onCheckedChange={(v) => update({ animate: v })}
+                />
+              </div>
+            </div>
           </div>
         )}
 
