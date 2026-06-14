@@ -170,7 +170,9 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
         </div>
       </Section>
 
-      {(comp.variant === "split" || comp.variant === "full") && (
+      {(comp.variant === "split" ||
+        comp.variant === "full" ||
+        comp.variant === "inset") && (
         <Section title="Image">
           <input
             ref={fileRef}
