@@ -287,32 +287,15 @@ export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Pr
               onChange={onUploadMulti}
               className="hidden"
             />
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                disabled={comp.images.length >= 6}
-                onClick={() => multiFileRef.current?.click()}
-              >
-                <Plus className="mr-1 h-4 w-4" /> Add images
-              </Button>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 shrink-0"
-                      onClick={() => update({ multiSeed: newSeed() })}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Reroll layout</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={comp.images.length >= 6}
+              onClick={() => multiFileRef.current?.click()}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Add images
+            </Button>
             {comp.images.length > 0 && (
               <div className="space-y-2">
                 {comp.images.map((im, i) => (
