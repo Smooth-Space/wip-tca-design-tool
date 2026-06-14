@@ -72,8 +72,9 @@ export function MultiSphere({
     cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(1);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(w, h, false);
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
     renderer.setClearColor(0x000000, 0);
     const canvas = renderer.domElement;
     canvas.style.width = `${w}px`;
