@@ -1,5 +1,4 @@
 export type Format = "1:1" | "4:5" | "9:16";
-export type TitleCase = "upper" | "sentence";
 export type Mode = "light" | "mixed" | "heavy";
 export type Variant = "none" | "split" | "full";
 export type SplitOrder = "image-first" | "title-first";
@@ -9,7 +8,6 @@ export const PLACEHOLDER_SRC = "/placeholder.jpg";
 export interface Title {
   id: string;
   text: string;
-  case: TitleCase;
 }
 
 export interface ImageItem {
@@ -21,6 +19,7 @@ export interface Composition {
   format: Format;
   variant: Variant;
   background: string;
+  titleColor: string;
   textColor: string;
   titles: Title[];
   titleSizePx: number;
@@ -35,8 +34,9 @@ export const defaultComposition: Composition = {
   format: "1:1",
   variant: "none",
   background: "#FFFFFF",
+  titleColor: "#000000",
   textColor: "#000000",
-  titles: [{ id: "t1", text: "Title one", case: "upper" }],
+  titles: [{ id: "t1", text: "Title one" }],
   titleSizePx: 120,
   titleMode: "mixed",
   titleSeed: (Math.random() * 0xffffffff) >>> 0,

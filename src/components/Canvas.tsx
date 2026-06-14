@@ -35,7 +35,7 @@ export function Canvas({ comp }: { comp: Composition }) {
       titleMode={comp.titleMode}
       titleSeed={comp.titleSeed}
       titleSizePx={comp.titleSizePx}
-      color={comp.textColor}
+      titleColor={comp.titleColor}
     />
   );
 
