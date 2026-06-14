@@ -21,11 +21,30 @@ interface Props {
   setComp: React.Dispatch<React.SetStateAction<Composition>>;
   onExport: () => void;
   exporting: boolean;
+  onReset: () => void;
 }
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
 const TEMPLATES: Template[] = ["A", "B", "C", "D"];
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result as string);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function loadDimensions(src: string): Promise<{ naturalWidth: number; naturalHeight: number }> {
+  return new Promise((res) => {
+    const img = new Image();
+    img.onload = () => res({ naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight });
+    img.onerror = () => res({ naturalWidth: 0, naturalHeight: 0 });
+    img.src = src;
+  });
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -60,7 +79,7 @@ function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
   );
 }
 
-export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
+export function ControlPanel({ comp, setComp, onExport, exporting, onReset }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
@@ -71,22 +90,21 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
+    e.target.value = "";
+    (async () => {
+      const url = await fileToDataUrl(file);
+      const { naturalWidth, naturalHeight } = await loadDimensions(url);
       update({
         images: [
           {
             id: comp.images[0]?.id ?? crypto.randomUUID(),
             src: url,
-            naturalWidth: img.naturalWidth,
-            naturalHeight: img.naturalHeight,
+            naturalWidth,
+            naturalHeight,
           },
         ],
       });
-    };
-    img.src = url;
-    e.target.value = "";
+    })();
   };
 
   const onUploadMulti = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,21 +113,11 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
     e.target.value = "";
     Promise.all(
       files.map(
-        (file) =>
-          new Promise<{ id: string; src: string; naturalWidth: number; naturalHeight: number }>(
-            (resolve) => {
-              const url = URL.createObjectURL(file);
-              const img = new Image();
-              img.onload = () =>
-                resolve({
-                  id: crypto.randomUUID(),
-                  src: url,
-                  naturalWidth: img.naturalWidth,
-                  naturalHeight: img.naturalHeight,
-                });
-              img.src = url;
-            },
-          ),
+        async (file) => {
+          const url = await fileToDataUrl(file);
+          const { naturalWidth, naturalHeight } = await loadDimensions(url);
+          return { id: crypto.randomUUID(), src: url, naturalWidth, naturalHeight };
+        },
       ),
     ).then((items) => {
       setComp((c) => ({ ...c, images: [...c.images, ...items].slice(0, 6) }));
@@ -516,6 +524,17 @@ export function ControlPanel({ comp, setComp, onExport, exporting }: Props) {
       <Section title="Export">
         <Button className="w-full" onClick={onExport} disabled={exporting}>
           {exporting ? "Exporting…" : "Export JPG"}
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            if (window.confirm("Reset to a new composition? This clears your saved work.")) {
+              onReset();
+            }
+          }}
+        >
+          Reset / New
         </Button>
       </Section>
     </aside>

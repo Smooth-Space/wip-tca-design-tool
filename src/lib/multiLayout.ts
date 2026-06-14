@@ -1,4 +1,4 @@
-export interface ImgAspect { id: string; naturalWidth: number; naturalHeight: number; }
+export interface ImgAspect { id: string; naturalWidth: number; naturalHeight: number; src?: string; }
 export interface Placement { id: string; x: number; y: number; width: number; height: number; }
 
 const P = {
@@ -25,7 +25,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 function sizeFor(im: ImgAspect, frac: number, longRef: number) {
   const box = frac * longRef;
-  const ar = im.naturalWidth / im.naturalHeight;
+  const ar = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
   return ar >= 1 ? { w: box, h: box / ar } : { w: box * ar, h: box };
 }
 function szFrac(base: number, rng: () => number) {
@@ -63,7 +63,7 @@ export function computeMultiLayout(
   seed: number,
   clearOverride?: number,   // when provided (incl. 0), replaces P.titleClearFrac
 ): Placement[] {
-  const imgs = images.slice(0, 3);
+  const imgs = images.filter((im) => im.src === undefined || im.src !== "").slice(0, 3);
   if (imgs.length === 0) return [];
   const rng = makeRng(seed);
   const longRef = Math.max(W, H);
