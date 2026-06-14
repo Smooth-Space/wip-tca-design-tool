@@ -5,6 +5,7 @@ import { computeMultiLayout } from "@/lib/multiLayout";
 import { TitleLine } from "@/components/TitleLine";
 import { Caption } from "@/components/Caption";
 import { CoverImage, MultiImages, Overlay } from "@/components/ImageLayers";
+import { MultiSphere } from "@/components/MultiSphere";
 
 export function TemplateD({
   comp,
@@ -42,7 +43,18 @@ export function TemplateD({
       )}
       {comp.variant === "multi" && (
         <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-          <MultiImages images={comp.images} placements={multiPlacements} imageOverlay={comp.imageOverlay} />
+          {comp.animate ? (
+            <MultiSphere
+              images={comp.images}
+              w={w}
+              h={h}
+              imageOverlay={comp.imageOverlay}
+              animSeed={comp.animSeed}
+              playing={comp.animPlaying}
+            />
+          ) : (
+            <MultiImages images={comp.images} placements={multiPlacements} imageOverlay={comp.imageOverlay} />
+          )}
         </div>
       )}
 
