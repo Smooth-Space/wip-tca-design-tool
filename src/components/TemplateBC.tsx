@@ -2,7 +2,7 @@ import { TEMPLATE_CAPTIONS, type Composition } from "@/lib/composition";
 import type { Placement } from "@/lib/multiLayout";
 import { TemplateLayout } from "@/components/TemplateLayout";
 import { CoverImage, MultiImages, Overlay } from "@/components/ImageLayers";
-import { MultiSphere } from "@/components/MultiSphere";
+import { MultiSphere, type MultiSphereHandle } from "@/components/MultiSphere";
 
 // Templates B and C: shared caption layout, image layer behind text.
 export function TemplateBC({
@@ -12,6 +12,7 @@ export function TemplateBC({
   imgSrc,
   title,
   multiPlacements,
+  sphereRef,
 }: {
   comp: Composition;
   w: number;
@@ -19,6 +20,7 @@ export function TemplateBC({
   imgSrc: string;
   title: React.ReactNode;
   multiPlacements: Placement[];
+  sphereRef?: React.Ref<MultiSphereHandle>;
 }) {
   const slots = TEMPLATE_CAPTIONS[comp.template];
   const centeredTitle = (
@@ -88,6 +90,7 @@ export function TemplateBC({
       <div style={{ position: "absolute", inset: 0 }}>
         {comp.animate ? (
           <MultiSphere
+            ref={sphereRef}
             images={comp.images}
             w={w}
             h={h}

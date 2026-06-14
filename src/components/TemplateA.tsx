@@ -3,7 +3,7 @@ import type { Placement } from "@/lib/multiLayout";
 import { Caption } from "@/components/Caption";
 import { TemplateLayout } from "@/components/TemplateLayout";
 import { CoverImage, MultiImages, Overlay } from "@/components/ImageLayers";
-import { MultiSphere } from "@/components/MultiSphere";
+import { MultiSphere, type MultiSphereHandle } from "@/components/MultiSphere";
 
 export function TemplateA({
   comp,
@@ -12,6 +12,7 @@ export function TemplateA({
   imgSrc,
   title,
   multiPlacements,
+  sphereRef,
 }: {
   comp: Composition;
   w: number;
@@ -19,6 +20,7 @@ export function TemplateA({
   imgSrc: string;
   title: React.ReactNode;
   multiPlacements: Placement[];
+  sphereRef?: React.Ref<MultiSphereHandle>;
 }) {
   const slots = TEMPLATE_CAPTIONS.A;
   const centeredTitle = (
@@ -117,6 +119,7 @@ export function TemplateA({
       <div style={{ position: "absolute", inset: 0 }}>
         {comp.animate ? (
           <MultiSphere
+            ref={sphereRef}
             images={comp.images}
             w={w}
             h={h}
