@@ -1,6 +1,8 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { computeAxes, makeRng, type Mode } from "@/lib/engine";
 import type { Title } from "@/lib/composition";
+import { TitleSpans } from "@/components/TitleLine";
+import { TITLE_FONT, TITLE_LETTER_SPACING, TITLE_LINE_HEIGHT } from "@/lib/typo";
 
 interface TitleBlockProps {
   titles: Title[];
@@ -93,33 +95,18 @@ export function TitleBlock({
 
   const renderSize = fitEnabled ? fittedSize : titleSizePx;
 
-  const renderSpans = (row: string, r: number) => {
-    const chars = Array.from(row);
-    if (chars.length === 0) return "\u00A0";
-    return chars.map((ch, i) => {
-      const a = axes[rowStart[r] + i];
-      return (
-        <span
-          key={i}
-          style={{
-            display: "inline",
-            fontVariationSettings: `'wght' ${a.wght}, 'SRFF' ${a.SRFF}, 'wdth' ${a.wdth}`,
-          }}
-        >
-          {ch}
-        </span>
-      );
-    });
-  };
+  const renderSpans = (row: string, r: number) => (
+    <TitleSpans text={row} axes={axes} startOffset={rowStart[r]} />
+  );
 
   return (
     <div
       style={{
-        lineHeight: 0.9,
+        lineHeight: TITLE_LINE_HEIGHT,
         textAlign: "center",
-        fontFamily: "'ABC Arizona Plus Variable'",
+        fontFamily: TITLE_FONT,
         fontSize: renderSize,
-        letterSpacing: "-0.02em",
+        letterSpacing: TITLE_LETTER_SPACING,
         color: titleColor,
       }}
     >
@@ -149,8 +136,8 @@ export function TitleBlock({
               visibility: "hidden",
               whiteSpace: "nowrap",
               fontSize: FIT_REF_SIZE,
-              letterSpacing: "-0.02em",
-              fontFamily: "'ABC Arizona Plus Variable'",
+              letterSpacing: TITLE_LETTER_SPACING,
+              fontFamily: TITLE_FONT,
             }}
           >
             {renderSpans(rows[0], 0)}
