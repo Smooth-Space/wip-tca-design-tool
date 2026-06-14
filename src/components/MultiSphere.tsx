@@ -8,7 +8,7 @@ const SPHERE_RADIUS = 1;
 const TILE_SIZE = 0.45 * SPHERE_RADIUS; // tile edge ≈ 0.45 × R
 const FOV = 45;
 const FRAME_FILL = 0.8; // globe projected diameter ≈ 0.8 × shorter frame dim at scale 1
-const MIN_DIST_FACTOR = 2.2; // camera never closer than 2.2 × R (stays outside)
+const MIN_DIST_FACTOR = 1.2; // camera never closer than 1.2 × R (stays outside)
 
 // Camera distance that drives globeScale by dollying. globeScale = 1 frames the
 // whole globe; larger values move the camera closer (D = D_full / globeScale),
@@ -80,9 +80,15 @@ export function MultiSphere({
     canvas.style.height = `${h}px`;
     mount.appendChild(canvas);
 
-    const group = new THREE.Group();
-    scene.add(group);
-    groupRef.current = group;
+    // Group nesting: spinGroup (world Y spin) → tiltGroup (constant X tilt) → tiles.
+    const spinGroup = new THREE.Group();
+    scene.add(spinGroup);
+    groupRef.current = spinGroup;
+
+    const TILT = THREE.MathUtils.degToRad(30);
+    const tiltGroup = new THREE.Group();
+    tiltGroup.rotation.x = TILT;
+    spinGroup.add(tiltGroup);
 
     const loader = new THREE.TextureLoader();
     const textures: THREE.Texture[] = [];
@@ -154,17 +160,8 @@ export function MultiSphere({
         mesh.add(overlay);
       }
 
-      group.add(tileGroup);
+      tiltGroup.add(tileGroup);
     });
-
-    // Constant axis tilt: rotation runs around a tilted axis so no tile is
-    // parked on a pole. The spin group lives inside the tilted group.
-    const TILT = THREE.MathUtils.degToRad(25);
-    const tiltGroup = new THREE.Group();
-    tiltGroup.rotation.x = TILT;
-    scene.remove(group);
-    tiltGroup.add(group);
-    scene.add(tiltGroup);
 
     // Derive 3 poses from the seed; Y steps sum to 360deg for a seamless loop.
     const rng = makeRng(animSeed);
@@ -174,23 +171,23 @@ export function MultiSphere({
     const step2 = (Math.PI * 2) / 3 + stepJitter();
     const step3 = Math.PI * 2 - step1 - step2; // guarantees full 360 sum
 
-    group.rotation.y = startY;
+    spinGroup.rotation.y = startY;
 
     const tl = gsap.timeline({ repeat: -1 });
-    tl.to(group.rotation, { duration: 1.3, y: startY }) // hold pose1
-      .to(group.rotation, {
+    tl.to(spinGroup.rotation, { duration: 1.3, y: startY }) // hold pose1
+      .to(spinGroup.rotation, {
         duration: 1.7,
         ease: "power2.inOut",
         y: startY + step1,
       })
-      .to(group.rotation, { duration: 1.3, y: startY + step1 }) // hold pose2
-      .to(group.rotation, {
+      .to(spinGroup.rotation, { duration: 1.3, y: startY + step1 }) // hold pose2
+      .to(spinGroup.rotation, {
         duration: 1.7,
         ease: "power2.inOut",
         y: startY + step1 + step2,
       })
-      .to(group.rotation, { duration: 1.3, y: startY + step1 + step2 }) // hold pose3
-      .to(group.rotation, {
+      .to(spinGroup.rotation, { duration: 1.3, y: startY + step1 + step2 }) // hold pose3
+      .to(spinGroup.rotation, {
         duration: 1.7,
         ease: "power2.inOut",
         y: startY + step1 + step2 + step3,
@@ -204,7 +201,7 @@ export function MultiSphere({
     const render = () => {
       // Billboard: each tile faces the camera, accounting for tilt + spin.
       camera.getWorldQuaternion(tmpQ);
-      group.getWorldQuaternion(parentQ);
+      tiltGroup.getWorldQuaternion(parentQ);
       for (const t of tiles) t.quaternion.copy(parentQ).invert().multiply(tmpQ);
       renderer.render(scene, camera);
       raf = requestAnimationFrame(render);
