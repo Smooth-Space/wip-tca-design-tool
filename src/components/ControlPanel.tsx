@@ -17,7 +17,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
-const VARIANTS: Variant[] = ["none", "split", "full"];
+const VARIANTS: Variant[] = ["none", "split", "full", "multi"];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
