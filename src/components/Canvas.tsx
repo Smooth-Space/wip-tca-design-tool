@@ -292,6 +292,9 @@ export function Canvas({
   );
 
   const renderInner = () => {
+    if (comp.template === "D") {
+      return <TemplateD comp={comp} w={w} h={h} imgSrc={imgSrc} coverImg={coverImg} />;
+    }
     if (comp.template !== "A") {
       return renderTemplate();
     }
