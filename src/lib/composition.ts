@@ -82,5 +82,5 @@ export const defaultComposition: Composition = {
   images: [],
   splitOrder: "image-first",
   multiSeed: (Math.random() * 0xffffffff) >>> 0,
-  captions: { text1: "Text 1", text2: "Text 2", text3: "", text4: "" },
+  captions: { text1: "Text 1", text2: "Text 2", text3: "Text 3", text4: "Text 4" },
 };
