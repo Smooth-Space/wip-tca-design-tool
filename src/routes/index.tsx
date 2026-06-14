@@ -76,7 +76,7 @@ function Composer() {
           if (restored.titleSizeMode !== "fixed" && restored.titleSizeMode !== "fit") {
             restored.titleSizeMode = "fixed";
           }
-          delete (restored as Record<string, unknown>).titleShiftOffsets;
+          delete (restored as unknown as Record<string, unknown>).titleShiftOffsets;
           setComp(restored);
         }
       } catch {
