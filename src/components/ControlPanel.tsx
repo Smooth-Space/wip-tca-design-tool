@@ -1,12 +1,14 @@
-import type { Composition, Format, Mode, TitleCase } from "@/lib/composition";
+import type { Composition, Format, Mode, TitleCase, Variant, SplitOrder } from "@/lib/composition";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Plus, X, Shuffle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { newSeed } from "@/lib/engine";
 import { cn } from "@/lib/utils";
+import { useRef } from "react";
 
 interface Props {
   comp: Composition;
@@ -15,6 +17,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
+const VARIANTS: Variant[] = ["none", "split", "full"];
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -27,8 +30,34 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
+function AutoTextarea(props: React.ComponentProps<typeof Textarea>) {
+  const ref = useRef<HTMLTextAreaElement>(null);
+  const grow = (el: HTMLTextAreaElement | null) => {
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  };
+  return (
+    <Textarea
+      {...props}
+      ref={ref}
+      onInput={(e) => grow(e.currentTarget)}
+      onFocus={(e) => grow(e.currentTarget)}
+    />
+  );
+}
+
 export function ControlPanel({ comp, setComp }: Props) {
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    update({ images: [{ id: comp.images[0]?.id ?? crypto.randomUUID(), src: url }] });
+    e.target.value = "";
+  };
 
   return (
     <aside className="flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-r border-border bg-background p-5">
@@ -52,6 +81,75 @@ export function ControlPanel({ comp, setComp }: Props) {
           ))}
         </div>
       </Section>
+
+      <Section title="Variant">
+        <div className="grid grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+          {VARIANTS.map((v) => (
+            <button
+              key={v}
+              onClick={() => update({ variant: v })}
+              className={cn(
+                "rounded-md py-1.5 text-sm font-medium capitalize transition-colors",
+                comp.variant === v
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+      </Section>
+
+      {(comp.variant === "split" || comp.variant === "full") && (
+        <Section title="Image">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            onChange={onUpload}
+            className="hidden"
+          />
+          <div className="flex items-center gap-3">
+            <img
+              src={comp.images[0]?.src ?? "/placeholder.jpg"}
+              alt=""
+              className="h-14 w-14 shrink-0 rounded-md border border-border object-cover"
+            />
+            <div className="flex flex-1 flex-col gap-1.5">
+              <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                Upload / Replace
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={!comp.images[0]}
+                onClick={() => update({ images: [] })}
+              >
+                Remove
+              </Button>
+            </div>
+          </div>
+          {comp.variant === "split" && (
+            <div className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1">
+              {(["image-first", "title-first"] as SplitOrder[]).map((o) => (
+                <button
+                  key={o}
+                  onClick={() => update({ splitOrder: o })}
+                  className={cn(
+                    "rounded-md py-1 text-xs font-medium transition-colors",
+                    comp.splitOrder === o
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {o === "image-first" ? "Image first" : "Title first"}
+                </button>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
 
       <Section title="Colors">
         <div className="grid grid-cols-2 gap-3">
@@ -201,15 +299,19 @@ export function ControlPanel({ comp, setComp }: Props) {
 
       <Section title="Text">
         <div className="space-y-2">
-          <Input
+          <AutoTextarea
             value={comp.info.text1}
             onChange={(e) => update({ info: { ...comp.info, text1: e.target.value } })}
             placeholder="Text 1"
+            rows={2}
+            className="resize-none"
           />
-          <Input
+          <AutoTextarea
             value={comp.info.text2}
             onChange={(e) => update({ info: { ...comp.info, text2: e.target.value } })}
             placeholder="Text 2"
+            rows={2}
+            className="resize-none"
           />
         </div>
       </Section>
