@@ -1,5 +1,5 @@
 import type { ImageItem } from "@/lib/composition";
-import type { MultiPlacement } from "@/lib/multiLayout";
+import type { Placement } from "@/lib/multiLayout";
 
 // The cover-fill image used for full / split image layers.
 export function CoverImage({ src }: { src: string }) {
@@ -37,7 +37,7 @@ export function MultiImages({
   imageOverlay,
 }: {
   images: ImageItem[];
-  placements: MultiPlacement[];
+  placements: Placement[];
   imageOverlay: number;
 }) {
   return (
