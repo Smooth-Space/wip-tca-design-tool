@@ -16,6 +16,7 @@ export function Caption({
   selectedTitleId,
   onSelectTitle,
   hideSelection,
+  hidden,
 }: {
   text: string;
   color: string;
@@ -25,7 +26,9 @@ export function Caption({
   selectedTitleId?: string | null;
   onSelectTitle?: (id: string | null) => void;
   hideSelection?: boolean;
+  hidden?: boolean;
 }) {
+  if (hidden && text === "") return null;
   const isSelected = !!captionKey && selectedTitleId === captionKey;
   const isEmpty = text === "";
   return (
