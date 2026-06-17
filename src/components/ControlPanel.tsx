@@ -283,6 +283,9 @@ export function ControlPanel({
                   });
                 }
               }
+              if (t !== "D" && titles.length > 1) {
+                titles = [{ id: titles[0].id, text: titles.map((x) => x.text).join("\n") }];
+              }
               return {
                 ...c,
                 template: t,
