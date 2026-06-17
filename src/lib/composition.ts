@@ -86,6 +86,7 @@ export interface Composition {
   imageOverlay: number;
   captions: { text1: string; text2: string; text3: string; text4: string };
   captionColors: { text1: string; text2: string; text3: string; text4: string };
+  captionHidden: { text1: boolean; text2: boolean; text3: boolean; text4: boolean };
 }
 
 export const defaultComposition: Composition = {
@@ -111,4 +112,5 @@ export const defaultComposition: Composition = {
   imageOverlay: 0.2,
   captions: { text1: "Text 1", text2: "Text 2", text3: "Text 3", text4: "Text 4" },
   captionColors: { text1: "#000000", text2: "#000000", text3: "#000000", text4: "#000000" },
+  captionHidden: { text1: false, text2: false, text3: false, text4: false },
 };

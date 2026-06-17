@@ -111,6 +111,7 @@ export function TemplateA({
                 selectedTitleId={selectedTitleId}
                 onSelectTitle={onSelectTitle}
                 hideSelection={hideSelection}
+              hidden={comp.captionHidden[left.key]}
               />
             )}
           </div>
@@ -124,6 +125,7 @@ export function TemplateA({
                 selectedTitleId={selectedTitleId}
                 onSelectTitle={onSelectTitle}
                 hideSelection={hideSelection}
+              hidden={comp.captionHidden[right.key]}
               />
             )}
           </div>
@@ -180,6 +182,7 @@ export function TemplateA({
           slots={slots}
           captions={comp.captions}
           captionColors={comp.captionColors}
+          captionHidden={comp.captionHidden}
           selectedTitleId={selectedTitleId}
           onSelectTitle={onSelectTitle}
           hideSelection={hideSelection}

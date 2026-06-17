@@ -167,6 +167,7 @@ export function TemplateD({
               selectedTitleId={selectedTitleId}
               onSelectTitle={onSelectTitle}
               hideSelection={hideSelection}
+              hidden={comp.captionHidden.text1}
               style={{ flex: 1, paddingLeft: comp.variant === "split" ? 40 : 0 }}
             />
             <Caption
@@ -177,6 +178,7 @@ export function TemplateD({
               selectedTitleId={selectedTitleId}
               onSelectTitle={onSelectTitle}
               hideSelection={hideSelection}
+              hidden={comp.captionHidden.text2}
               style={{ flex: 1, paddingRight: comp.variant === "split" ? 40 : 0 }}
             />
           </div>
