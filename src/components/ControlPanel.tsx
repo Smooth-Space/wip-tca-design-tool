@@ -197,6 +197,8 @@ export function ControlPanel({
   const splitFileRef = useRef<HTMLInputElement>(null);
 
   const usesImage = comp.variant === "split" || comp.variant === "full";
+  const lineCount =
+    comp.template === "D" ? 0 : comp.titles[0]?.text.split("\n").length ?? 1;
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
