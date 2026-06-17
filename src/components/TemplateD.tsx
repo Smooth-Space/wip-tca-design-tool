@@ -14,12 +14,18 @@ export function TemplateD({
   h,
   imgSrc,
   sphereRef,
+  selectedTitleId,
+  onSelectTitle,
+  hideSelection,
 }: {
   comp: Composition;
   w: number;
   h: number;
   imgSrc: string;
   sphereRef?: React.Ref<MultiSphereHandle>;
+  selectedTitleId?: string | null;
+  onSelectTitle?: (id: string | null) => void;
+  hideSelection?: boolean;
 }) {
   const dTitles = useMemo(
     () => [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""],
