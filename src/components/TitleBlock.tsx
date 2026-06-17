@@ -14,6 +14,9 @@ interface TitleBlockProps {
   titleShift?: boolean;
   titleShiftSeed?: number;
   contentWidthPx?: number;
+  selectedTitleId?: string | null;
+  onSelectTitle?: (id: string | null) => void;
+  hideSelection?: boolean;
 }
 
 const FIT_REF_SIZE = 200;
@@ -42,7 +45,11 @@ export function TitleBlock({
   titleShift = false,
   titleShiftSeed = 0,
   contentWidthPx = 1000,
+  selectedTitleId,
+  onSelectTitle,
+  hideSelection,
 }: TitleBlockProps) {
+  const isSelected = !!selectedTitleId && selectedTitleId === titles[0]?.id;
   // Split each title on "\n" into rendered rows, keeping the parent title id.
   const lines = useMemo(
     () =>
