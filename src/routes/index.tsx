@@ -72,6 +72,8 @@ function Composer() {
   const [exporting, setExporting] = useState(false);
   const [exportingMp4, setExportingMp4] = useState(false);
   const [mp4Progress, setMp4Progress] = useState(0);
+  const [selectedTitleId, setSelectedTitleId] = useState<string | null>(null);
+  const hideSelection = exporting || exportingMp4;
 
   // Restore once on mount
   useEffect(() => {
