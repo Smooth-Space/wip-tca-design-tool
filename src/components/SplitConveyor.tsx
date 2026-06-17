@@ -2,12 +2,11 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import type { ImageItem } from "@/lib/composition";
 import type { AnimHandle } from "@/lib/anim";
 
-const HOLD_SEC = 0.9; // pause with a card centered (snappier than before)
-const EASE_SEC = 0.6; // slide to the next card
-const GAP_PX = 8; // resting gap between cards, composition px
-const CARD_H_FRAC = 0.75; // card height ÷ band height
-const MAX_W_FRAC = 0.9; // cap card width ÷ band width (keep peek room)
-const STAGGER_SEC = 0.12; // per-card lead-lag → bigger gap-fan during the slide
+const HOLD_SEC = 1.0; // pause with a card centered (tunable)
+const EASE_SEC = 0.7; // slide to the next card (tunable; longer = smoother)
+const GAP_PX = 8; // resting gap between cards, composition px (keep)
+const CARD_H_FRAC = 0.82; // card height ÷ band height (tunable)
+const MAX_W_FRAC = 0.9; // cap card width ÷ band width
 
 type Props = { images: ImageItem[]; imageOverlay: number; animSeed: number; playing: boolean };
 
@@ -77,43 +76,28 @@ export const SplitConveyor = forwardRef<AnimHandle, Props>(function SplitConveyo
       const N = els.length;
       if (N === 0) return;
 
-      const GAP = GAP_PX * dpr;
+      const gap = GAP_PX * dpr;
       const boxH = CARD_H_FRAC * H;
-      // constant card height; width from native aspect, capped to keep peek room
+      const maxW = MAX_W_FRAC * W;
+
+      // Native-aspect card sizes (contained in band height and capped width)
       const dims = els.map((el) => {
         const ar = el.naturalWidth && el.naturalHeight ? el.naturalWidth / el.naturalHeight : 1;
-        const ch = boxH;
-        const cw = Math.min(ch * ar, MAX_W_FRAC * W);
+        let ch = boxH,
+          cw = ch * ar;
+        if (cw > maxW) {
+          cw = maxW;
+          ch = cw / ar;
+        }
         return { cw, ch };
       });
 
-      // cumulative strip centers C[] and total wrap length L
-      const C: number[] = new Array(N);
-      let cursor = 0;
-      for (let i = 0; i < N; i++) {
-        C[i] = cursor + dims[i].cw / 2;
-        cursor += dims[i].cw + GAP;
-      }
-      const L = cursor; // includes trailing gap → seamless wrap
-
-      const cycle = HOLD_SEC + EASE_SEC;
-      const total = N * cycle;
-      const shiftAt = (tt: number) => {
-        const m = ((tt % total) + total) % total;
-        const k = Math.floor(m / cycle);
-        const local = m - k * cycle;
-        const p = local < HOLD_SEC ? 0 : smooth((local - HOLD_SEC) / EASE_SEC);
-        const c0 = C[k];
-        const c1 = k + 1 < N ? C[k + 1] : C[0] + L;
-        return W / 2 - (c0 + (c1 - c0) * p);
-      };
-
+      // Single image: center it, no motion.
       if (N === 1) {
         const { cw, ch } = dims[0];
-        const left = W / 2 - cw / 2,
+        const left = (W - cw) / 2,
           top = (H - ch) / 2;
-        const el = els[0];
-        if (el.complete && el.naturalWidth > 0) ctx.drawImage(el, left, top, cw, ch);
+        if (els[0].complete && els[0].naturalWidth > 0) ctx.drawImage(els[0], left, top, cw, ch);
         if (imageOverlay > 0) {
           ctx.globalAlpha = imageOverlay;
           ctx.fillStyle = "#000";
@@ -123,34 +107,41 @@ export const SplitConveyor = forwardRef<AnimHandle, Props>(function SplitConveyo
         return;
       }
 
-      // undelayed screen offset of each card (px from center), wrapped to nearest copy
-      const baseShift = shiftAt(t);
-      const off = C.map((c) => {
-        let rel = c + baseShift - W / 2;
-        rel = (((rel % L) + L) % L);
-        if (rel > L / 2) rel -= L;
-        return rel;
-      });
-      // rank ascending by offset → leftmost = rank 0 leads, rightmost lags
-      const delay: number[] = new Array(N);
-      off
-        .map((_, i) => i)
-        .sort((a, b) => off[a] - off[b])
-        .forEach((cardIdx, r) => {
-          delay[cardIdx] = STAGGER_SEC * r;
-        });
-
-      const items: { i: number; sx: number }[] = [];
+      // One set of cards: centers within the set + total set length (gap after each card).
+      const Cset: number[] = [];
+      let cur = 0;
       for (let i = 0; i < N; i++) {
-        const x = C[i] + shiftAt(t - delay[i]); // monotonic ease, per-card latency
-        let rel = x - W / 2;
-        rel = (((rel % L) + L) % L);
-        if (rel > L / 2) rel -= L;
-        items.push({ i, sx: W / 2 + rel });
+        Cset[i] = cur + dims[i].cw / 2;
+        cur += dims[i].cw + gap;
       }
-      items.sort((a, b) => Math.abs(b.sx - W / 2) - Math.abs(a.sx - W / 2)); // centered card on top
+      const setLen = cur;
 
-      for (const { i, sx } of items) {
+      // Rigid strip shift: hold a card centered, then ease to center the next (wraps after N).
+      const cyc = HOLD_SEC + EASE_SEC,
+        total = N * cyc;
+      const u = ((t % total) + total) % total;
+      const k = Math.floor(u / cyc);
+      const local = u - k * cyc;
+      const f = local < HOLD_SEC ? 0 : smooth((local - HOLD_SEC) / EASE_SEC);
+      const Ck = Cset[k];
+      const nextC = k + 1 < N ? Cset[k + 1] : Cset[0] + setLen;
+      const shift = W / 2 - (Ck + (nextC - Ck) * f);
+
+      // Draw the set repeated across enough copies to overfill the band on both sides,
+      // so cards recycle OFF-SCREEN (no on-screen pop). All cards share `shift` → rigid, smooth.
+      const firstCopy = Math.floor((-shift - maxW) / setLen) - 1;
+      const lastCopy = Math.floor((-shift + W + maxW) / setLen) + 1;
+      const draws: { i: number; sx: number }[] = [];
+      for (let c = firstCopy; c <= lastCopy; c++) {
+        for (let i = 0; i < N; i++) {
+          const sx = Cset[i] + c * setLen + shift;
+          if (sx < -maxW || sx > W + maxW) continue;
+          draws.push({ i, sx });
+        }
+      }
+      draws.sort((a, b) => Math.abs(b.sx - W / 2) - Math.abs(a.sx - W / 2)); // centered card on top
+
+      for (const { i, sx } of draws) {
         const { cw, ch } = dims[i];
         const left = sx - cw / 2,
           top = (H - ch) / 2;
