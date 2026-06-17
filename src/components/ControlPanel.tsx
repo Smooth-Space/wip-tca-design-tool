@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/collapsible";
 import { newSeed } from "@/lib/engine";
 import { cn } from "@/lib/utils";
-import { useEffect, useRef } from "react";
+import { forwardRef, useEffect, useRef } from "react";
 
 interface Props {
   comp: Composition;
