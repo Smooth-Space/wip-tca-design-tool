@@ -651,7 +651,7 @@ export function ControlPanel({
         <Button className="w-full" onClick={onExport} disabled={exporting}>
           {exporting ? "Exporting…" : "Export JPG"}
         </Button>
-        {comp.variant === "multi" && comp.animate && (
+        {(comp.variant === "multi" || comp.variant === "split") && comp.animate && (
           <Button className="w-full" onClick={onExportMp4} disabled={exportingMp4}>
             {exportingMp4
               ? `Exporting MP4… ${Math.round((mp4Progress ?? 0) * 100)}%`
