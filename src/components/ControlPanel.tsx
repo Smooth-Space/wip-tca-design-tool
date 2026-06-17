@@ -194,6 +194,7 @@ export function ControlPanel({
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
+  const splitFileRef = useRef<HTMLInputElement>(null);
 
   const usesImage = comp.variant === "split" || comp.variant === "full";
 
@@ -231,6 +232,21 @@ export function ControlPanel({
       ),
     ).then((items) => {
       setComp((c) => ({ ...c, images: [...c.images, ...items] }));
+    });
+  };
+
+  const onUploadSplit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    e.target.value = "";
+    Promise.all(
+      files.map(async (file) => {
+        const url = await fileToDataUrl(file);
+        const { naturalWidth, naturalHeight } = await loadDimensions(url);
+        return { id: crypto.randomUUID(), src: url, naturalWidth, naturalHeight };
+      }),
+    ).then((items) => {
+      setComp((c) => ({ ...c, images: [...c.images, ...items].slice(0, 5) }));
     });
   };
 
