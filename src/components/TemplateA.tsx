@@ -182,6 +182,7 @@ export function TemplateA({
           slots={slots}
           captions={comp.captions}
           captionColors={comp.captionColors}
+          captionHidden={comp.captionHidden}
           selectedTitleId={selectedTitleId}
           onSelectTitle={onSelectTitle}
           hideSelection={hideSelection}
