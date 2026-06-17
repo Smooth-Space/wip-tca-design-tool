@@ -652,7 +652,7 @@ export function ControlPanel({
         <div className="space-y-2 pt-3">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Size</Label>
-            {comp.template !== "D" && comp.titles.length === 1 && (
+            {comp.template !== "D" && lineCount === 1 && (
               <div className="flex items-center gap-2">
                 <Label className="text-xs text-muted-foreground">Fit width</Label>
                 <Switch
@@ -664,7 +664,7 @@ export function ControlPanel({
               </div>
             )}
           </div>
-          {comp.titleSizeMode === "fit" && comp.template !== "D" && comp.titles.length === 1 ? (
+          {comp.titleSizeMode === "fit" && comp.template !== "D" && lineCount === 1 ? (
             <p className="text-xs text-muted-foreground">Auto-scaled to fit the width.</p>
           ) : (
             <>
