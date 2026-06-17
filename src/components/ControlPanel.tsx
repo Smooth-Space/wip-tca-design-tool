@@ -401,24 +401,18 @@ export function ControlPanel({
               <Label className="text-xs">Animate</Label>
               <div className="flex items-center gap-1">
                 {comp.animate && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => update({ animPlaying: !comp.animPlaying })}
-                    >
-                      {comp.animPlaying ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <RerollButton
-                      onClick={() => update({ animSeed: newSeed() })}
-                      tooltip="Reroll animation"
-                    />
-                  </>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7"
+                    onClick={() => update({ animPlaying: !comp.animPlaying })}
+                  >
+                    {comp.animPlaying ? (
+                      <Pause className="h-4 w-4" />
+                    ) : (
+                      <Play className="h-4 w-4" />
+                    )}
+                  </Button>
                 )}
                 <Switch
                   checked={comp.animate}
