@@ -8,6 +8,7 @@ function CaptionCell({
   slot,
   captions,
   captionColors,
+  captionHidden,
   selectedTitleId,
   onSelectTitle,
   hideSelection,
@@ -15,6 +16,7 @@ function CaptionCell({
   slot?: CaptionSlot;
   captions: Captions;
   captionColors: CaptionColors;
+  captionHidden: Record<CaptionKey, boolean>;
   selectedTitleId?: string | null;
   onSelectTitle?: (id: string | null) => void;
   hideSelection?: boolean;
@@ -27,6 +29,7 @@ function CaptionCell({
           color={captionColors[slot.key]}
           align={slot.align}
           captionKey={slot.key}
+          hidden={captionHidden[slot.key]}
           selectedTitleId={selectedTitleId}
           onSelectTitle={onSelectTitle}
           hideSelection={hideSelection}
@@ -40,6 +43,7 @@ function CaptionRow({
   slots,
   captions,
   captionColors,
+  captionHidden,
   anchor,
   selectedTitleId,
   onSelectTitle,
@@ -48,6 +52,7 @@ function CaptionRow({
   slots: CaptionSlot[];
   captions: Captions;
   captionColors: CaptionColors;
+  captionHidden: Record<CaptionKey, boolean>;
   anchor: "top" | "bottom";
   selectedTitleId?: string | null;
   onSelectTitle?: (id: string | null) => void;
@@ -68,6 +73,7 @@ function CaptionRow({
         slot={left}
         captions={captions}
         captionColors={captionColors}
+        captionHidden={captionHidden}
         selectedTitleId={selectedTitleId}
         onSelectTitle={onSelectTitle}
         hideSelection={hideSelection}
@@ -76,6 +82,7 @@ function CaptionRow({
         slot={right}
         captions={captions}
         captionColors={captionColors}
+        captionHidden={captionHidden}
         selectedTitleId={selectedTitleId}
         onSelectTitle={onSelectTitle}
         hideSelection={hideSelection}
@@ -88,6 +95,7 @@ export function TemplateLayout({
   slots,
   captions,
   captionColors,
+  captionHidden,
   gap = 0,
   children,
   selectedTitleId,
@@ -97,6 +105,7 @@ export function TemplateLayout({
   slots: CaptionSlot[];
   captions: Captions;
   captionColors: CaptionColors;
+  captionHidden: Record<CaptionKey, boolean>;
   gap?: number;
   children: React.ReactNode;
   selectedTitleId?: string | null;
@@ -118,6 +127,7 @@ export function TemplateLayout({
         slots={slots}
         captions={captions}
         captionColors={captionColors}
+        captionHidden={captionHidden}
         anchor="top"
         selectedTitleId={selectedTitleId}
         onSelectTitle={onSelectTitle}
@@ -128,6 +138,7 @@ export function TemplateLayout({
         slots={slots}
         captions={captions}
         captionColors={captionColors}
+        captionHidden={captionHidden}
         anchor="bottom"
         selectedTitleId={selectedTitleId}
         onSelectTitle={onSelectTitle}
