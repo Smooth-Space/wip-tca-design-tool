@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
 });
 
 const STORAGE_KEY = "tca-composition";
-const VERSION = 4;
+const VERSION = 5;
 
 function nativeRectWithin(node: HTMLElement, ancestor: HTMLElement) {
   let x = 0,
