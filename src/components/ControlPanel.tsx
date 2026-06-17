@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/collapsible";
 import { newSeed } from "@/lib/engine";
 import { cn } from "@/lib/utils";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   comp: Composition;
@@ -25,6 +25,8 @@ interface Props {
   onExportMp4?: () => void;
   exportingMp4?: boolean;
   mp4Progress?: number;
+  selectedTitleId?: string | null;
+  onSelectTitle?: (id: string | null) => void;
 }
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
