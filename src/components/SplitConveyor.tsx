@@ -2,12 +2,12 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import type { ImageItem } from "@/lib/composition";
 import type { AnimHandle } from "@/lib/anim";
 
-const HOLD_SEC = 1.5; // pause with a card centered (tunable)
-const EASE_SEC = 1.0; // slide to the next card (tunable)
-const SLOT_FRAC = 0.6; // card-center spacing ÷ band width; <1 → neighbors peek, cropped by edges (tunable)
-const CARD_H_FRAC = 0.7; // card box height ÷ band height (tunable)
-const BOX_W_FRAC = 0.9; // card box width ÷ slot → small gap at rest, no overlap (tunable)
-const SPREAD = 0.35; // extra spacing at peak velocity → gaps widen on the move, narrow at rest (tunable)
+const HOLD_SEC = 0.9; // pause with a card centered (snappier than before)
+const EASE_SEC = 0.6; // slide to the next card
+const GAP_PX = 8; // resting gap between cards, composition px
+const CARD_H_FRAC = 0.75; // card height ÷ band height
+const MAX_W_FRAC = 0.9; // cap card width ÷ band width (keep peek room)
+const STAGGER_SEC = 0.12; // per-card lead-lag → bigger gap-fan during the slide
 
 type Props = { images: ImageItem[]; imageOverlay: number; animSeed: number; playing: boolean };
 
@@ -68,8 +68,7 @@ export const SplitConveyor = forwardRef<AnimHandle, Props>(function SplitConveyo
     ro.observe(mount);
     resize();
 
-    const easeInOut = (e: number) =>
-      e < 0.5 ? 4 * e * e * e : 1 - Math.pow(-2 * e + 2, 3) / 2; // power3.inOut
+    const smooth = (e: number) => e * e * e * (e * (e * 6 - 15) + 10); // smootherstep
 
     drawRef.current = (t: number) => {
       const W = canvas.width,
@@ -78,49 +77,84 @@ export const SplitConveyor = forwardRef<AnimHandle, Props>(function SplitConveyo
       const N = els.length;
       if (N === 0) return;
 
-      const cycle = HOLD_SEC + EASE_SEC;
-      const total = N * cycle; // full seamless loop
-      const tt = ((t % total) + total) % total;
-      const k = Math.floor(tt / cycle);
-      const local = tt - k * cycle;
+      const GAP = GAP_PX * dpr;
+      const boxH = CARD_H_FRAC * H;
+      // constant card height; width from native aspect, capped to keep peek room
+      const dims = els.map((el) => {
+        const ar = el.naturalWidth && el.naturalHeight ? el.naturalWidth / el.naturalHeight : 1;
+        const ch = boxH;
+        const cw = Math.min(ch * ar, MAX_W_FRAC * W);
+        return { cw, ch };
+      });
 
-      let adv: number, vNorm: number;
-      if (local < HOLD_SEC) {
-        adv = k; // holding: card k centered, gaps at rest
-        vNorm = 0;
-      } else {
-        const e = (local - HOLD_SEC) / EASE_SEC;
-        adv = k + easeInOut(e); // sliding k -> k+1
-        vNorm = Math.sin(Math.PI * e); // speed profile: 0 at ends, 1 mid-slide
+      // cumulative strip centers C[] and total wrap length L
+      const C: number[] = new Array(N);
+      let cursor = 0;
+      for (let i = 0; i < N; i++) {
+        C[i] = cursor + dims[i].cw / 2;
+        cursor += dims[i].cw + GAP;
+      }
+      const L = cursor; // includes trailing gap → seamless wrap
+
+      const cycle = HOLD_SEC + EASE_SEC;
+      const total = N * cycle;
+      const shiftAt = (tt: number) => {
+        const m = ((tt % total) + total) % total;
+        const k = Math.floor(m / cycle);
+        const local = m - k * cycle;
+        const p = local < HOLD_SEC ? 0 : smooth((local - HOLD_SEC) / EASE_SEC);
+        const c0 = C[k];
+        const c1 = k + 1 < N ? C[k + 1] : C[0] + L;
+        return W / 2 - (c0 + (c1 - c0) * p);
+      };
+
+      if (N === 1) {
+        const { cw, ch } = dims[0];
+        const left = W / 2 - cw / 2,
+          top = (H - ch) / 2;
+        const el = els[0];
+        if (el.complete && el.naturalWidth > 0) ctx.drawImage(el, left, top, cw, ch);
+        if (imageOverlay > 0) {
+          ctx.globalAlpha = imageOverlay;
+          ctx.fillStyle = "#000";
+          ctx.fillRect(left, top, cw, ch);
+          ctx.globalAlpha = 1;
+        }
+        return;
       }
 
-      const SLOT = SLOT_FRAC * W;
-      const factor = 1 + SPREAD * vNorm; // gaps expand around screen center while moving
-      const boxH = CARD_H_FRAC * H;
+      // undelayed screen offset of each card (px from center), wrapped to nearest copy
+      const baseShift = shiftAt(t);
+      const off = C.map((c) => {
+        let rel = c + baseShift - W / 2;
+        rel = (((rel % L) + L) % L);
+        if (rel > L / 2) rel -= L;
+        return rel;
+      });
+      // rank ascending by offset → leftmost = rank 0 leads, rightmost lags
+      const delay: number[] = new Array(N);
+      off
+        .map((_, i) => i)
+        .sort((a, b) => off[a] - off[b])
+        .forEach((cardIdx, r) => {
+          delay[cardIdx] = STAGGER_SEC * r;
+        });
 
-      // nearest wrapped copy of each card, in slot units; draw far→near so the centered card is on top
-      const items = els
-        .map((_, i) => {
-          let o = (((i - adv) % N) + N) % N;
-          if (o > N / 2) o -= N;
-          return { i, o };
-        })
-        .sort((a, b) => Math.abs(b.o) - Math.abs(a.o));
+      const items: { i: number; sx: number }[] = [];
+      for (let i = 0; i < N; i++) {
+        const x = C[i] + shiftAt(t - delay[i]); // monotonic ease, per-card latency
+        let rel = x - W / 2;
+        rel = (((rel % L) + L) % L);
+        if (rel > L / 2) rel -= L;
+        items.push({ i, sx: W / 2 + rel });
+      }
+      items.sort((a, b) => Math.abs(b.sx - W / 2) - Math.abs(a.sx - W / 2)); // centered card on top
 
-      for (const { i, o } of items) {
-        const im = imgs[i];
-        const ar =
-          im?.naturalWidth && im?.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
-        let cw = SLOT * BOX_W_FRAC,
-          ch = cw / ar; // contain native aspect in the card box
-        if (ch > boxH) {
-          ch = boxH;
-          cw = ch * ar;
-        }
-        const cx = W / 2 + o * SLOT * factor; // peeking position, breathing with velocity
-        const left = cx - cw / 2,
+      for (const { i, sx } of items) {
+        const { cw, ch } = dims[i];
+        const left = sx - cw / 2,
           top = (H - ch) / 2;
-        if (left + cw < 0 || left > W) continue; // fully off-screen → skip (edges crop the rest)
+        if (left + cw < 0 || left > W) continue;
         const el = els[i];
         if (el.complete && el.naturalWidth > 0) ctx.drawImage(el, left, top, cw, ch);
         if (imageOverlay > 0) {
