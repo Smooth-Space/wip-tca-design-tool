@@ -4,6 +4,7 @@ import type {
   Mode,
   Template,
   SplitOrder,
+  SplitStyle,
   CaptionKey,
 } from "@/lib/composition";
 import { TEMPLATE_CAPTIONS, TEMPLATE_VARIANTS, PLACEHOLDER_SRC } from "@/lib/composition";
@@ -36,7 +37,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
-const TEMPLATES: Template[] = ["A", "B", "C", "D", "freeform"];
+const TEMPLATES: Template[] = ["A", "B", "D", "freeform"];
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((res, rej) => {
