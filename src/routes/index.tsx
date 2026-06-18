@@ -13,7 +13,6 @@ import {
   type Composition,
   type Format,
 } from "@/lib/composition";
-import { newSeed } from "@/lib/engine";
 
 export const Route = createFileRoute("/")({
   head: () => ({
