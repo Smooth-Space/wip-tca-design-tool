@@ -50,21 +50,22 @@ export function TitleBlock({
   hideSelection,
 }: TitleBlockProps) {
   const isSelected = !!selectedTitleId && selectedTitleId === titles[0]?.id;
-  // Split each title on "\n" into rendered rows, keeping the parent title id.
+  // A/B/C use one multi-line title field (titles[0]) only.
+  const t0 = titles[0];
   const lines = useMemo(
     () =>
-      titles.flatMap((t) =>
-        t.text.split("\n").map((text, i) => ({ text, titleId: t.id, key: `${t.id}-${i}` })),
-      ),
-    [titles],
+      (t0?.text ?? "")
+        .split("\n")
+        .map((text, i) => ({ text, titleId: t0?.id, key: `${t0?.id ?? "t"}-${i}` })),
+    [t0],
   );
   const rows = useMemo(() => lines.map((l) => l.text), [lines]);
 
-  // One flat stream across ALL rows; axes computed once (newlines excluded).
-  const axes = useMemo(() => {
-    const stream = titles.flatMap((t) => Array.from(t.text.replace(/\n/g, "")));
-    return computeAxes(stream, titleMode, titleSeed);
-  }, [titles, titleMode, titleSeed]);
+  // One flat stream across the single field's rows; axes computed once (newlines excluded).
+  const axes = useMemo(
+    () => computeAxes(Array.from((t0?.text ?? "").replace(/\n/g, "")), titleMode, titleSeed),
+    [t0, titleMode, titleSeed],
+  );
 
   // Start index of each row within the flat stream (no mutable counter in JSX).
   const rowStart = useMemo(() => {
