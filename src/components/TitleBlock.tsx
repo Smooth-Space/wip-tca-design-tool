@@ -1,8 +1,8 @@
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import { computeAxes, makeRng, type Mode } from "@/lib/engine";
+import { computeAxes, type Mode } from "@/lib/engine";
 import type { Title } from "@/lib/composition";
 import { TitleSpans } from "@/components/TitleLine";
-import { TITLE_FONT, TITLE_LETTER_SPACING, TITLE_LINE_HEIGHT } from "@/lib/typo";
+import { TITLE_FONT, TITLE_LETTER_SPACING, TITLE_LINE_HEIGHT, shiftOffsets } from "@/lib/typo";
 
 interface TitleBlockProps {
   titles: Title[];
@@ -22,20 +22,6 @@ interface TitleBlockProps {
 }
 
 const FIT_REF_SIZE = 200;
-
-// Evenly-spread, seed-shuffled offsets so lines clearly reach toward both margins.
-function shiftOffsets(n: number, seed: number): number[] {
-  if (n <= 1) return [0.5];
-  const rng = makeRng(seed);
-  const base = Array.from({ length: n }, (_, i) => i / (n - 1)); // evenly spread 0..1
-  for (let i = n - 1; i > 0; i--) {
-    // seeded shuffle
-    const j = Math.floor(rng() * (i + 1));
-    [base[i], base[j]] = [base[j], base[i]];
-  }
-  const spacing = 1 / (n - 1);
-  return base.map((v) => Math.min(1, Math.max(0, v + (rng() * 2 - 1) * spacing * 0.25))); // light jitter
-}
 
 export function TitleBlock({
   titles,
