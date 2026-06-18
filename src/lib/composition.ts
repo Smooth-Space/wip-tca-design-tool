@@ -148,6 +148,13 @@ export const defaultComposition: Composition = {
 export function normalizeComposition(data: Partial<Composition> | undefined): Composition {
   const c = { ...defaultComposition, ...(data ?? {}) } as Composition;
 
+  // migrate legacy template "C" → A (+ span split)
+  if ((c.template as string) === "C") {
+    c.template = "A";
+    if (c.variant === "split") c.splitStyle = "span";
+  }
+  if (c.splitStyle !== "half" && c.splitStyle !== "span") c.splitStyle = "half";
+
   // seeds — must be finite numbers
   if (typeof c.titleSeed !== "number" || !Number.isFinite(c.titleSeed)) c.titleSeed = newSeed();
   if (typeof c.titleShiftSeed !== "number" || !Number.isFinite(c.titleShiftSeed))
