@@ -104,6 +104,7 @@ export interface Composition {
   titleShiftSeed: number;
   images: ImageItem[];
   splitOrder: SplitOrder;
+  splitStyle: SplitStyle;
   multiSeed: number;
   animate: boolean;
   animSeed: number;
@@ -132,6 +133,7 @@ export const defaultComposition: Composition = {
   titleShiftSeed: newSeed(),
   images: [],
   splitOrder: "image-first",
+  splitStyle: "half",
   multiSeed: (Math.random() * 0xffffffff) >>> 0,
   animate: false,
   animSeed: newSeed(),
