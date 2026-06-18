@@ -717,6 +717,8 @@ export function ControlPanel({
             </>
           )}
         </div>
+
+        <AdvancedWave comp={comp} update={update} />
       </Section>
 
       {!isFreeform && (
