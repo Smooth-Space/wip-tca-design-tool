@@ -197,6 +197,7 @@ export function ControlPanel({
   onExportMp4,
   exportingMp4,
   mp4Progress,
+  onExportSvg,
   selectedTitleId,
   onSelectTitle,
 }: Props) {
