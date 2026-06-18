@@ -556,6 +556,8 @@ export function ControlPanel({
             />
           </div>
         )}
+        </>
+        )}
       </Section>
 
       <Section title="Colors">
