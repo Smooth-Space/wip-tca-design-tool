@@ -25,6 +25,7 @@ interface Props {
   onExportMp4?: () => void;
   exportingMp4?: boolean;
   mp4Progress?: number;
+  onExportSvg?: () => void;
   selectedTitleId?: string | null;
   onSelectTitle?: (id: string | null) => void;
 }
