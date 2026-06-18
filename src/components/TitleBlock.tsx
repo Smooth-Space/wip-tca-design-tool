@@ -8,6 +8,8 @@ interface TitleBlockProps {
   titles: Title[];
   titleMode: Mode;
   titleSeed: number;
+  titleAmplitude?: number | null;
+  titlePhase?: number | null;
   titleSizePx: number;
   titleColor: string;
   titleSizeMode?: "fixed" | "fit";
@@ -39,6 +41,8 @@ export function TitleBlock({
   titles,
   titleMode,
   titleSeed,
+  titleAmplitude = null,
+  titlePhase = null,
   titleSizePx,
   titleColor,
   titleSizeMode = "fixed",
@@ -63,8 +67,12 @@ export function TitleBlock({
 
   // One flat stream across the single field's rows; axes computed once (newlines excluded).
   const axes = useMemo(
-    () => computeAxes(Array.from((t0?.text ?? "").replace(/\n/g, "")), titleMode, titleSeed),
-    [t0, titleMode, titleSeed],
+    () =>
+      computeAxes(Array.from((t0?.text ?? "").replace(/\n/g, "")), titleMode, titleSeed, {
+        amplitude: titleAmplitude,
+        phase: titlePhase,
+      }),
+    [t0, titleMode, titleSeed, titleAmplitude, titlePhase],
   );
 
   // Start index of each row within the flat stream (no mutable counter in JSX).
