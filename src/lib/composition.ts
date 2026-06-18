@@ -104,6 +104,8 @@ export const defaultComposition: Composition = {
   titleSizeMode: "fixed",
   titleMode: "mixed",
   titleSeed: (Math.random() * 0xffffffff) >>> 0,
+  titleAmplitude: null,
+  titlePhase: null,
   titleShift: false,
   titleShiftSeed: newSeed(),
   images: [],
