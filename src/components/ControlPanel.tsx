@@ -290,18 +290,12 @@ export function ControlPanel({
           onChange={(t) =>
             setComp((c) => {
               let titles = c.titles;
-              if (t === "D" && titles.length < 2) {
-                const defaults = ["Title one", "Title two"];
+              if (t === "D") {
                 titles = [...titles];
                 while (titles.length < 2) {
-                  titles.push({
-                    id: crypto.randomUUID(),
-                    text: defaults[titles.length] ?? "New title",
-                  });
+                  titles.push({ id: crypto.randomUUID(), text: "" });
                 }
-              }
-              if (t !== "D" && titles.length > 1) {
-                titles = [{ id: titles[0].id, text: titles.map((x) => x.text).join("\n") }];
+                if (titles.length > 2) titles.length = 2;
               }
               return {
                 ...c,
