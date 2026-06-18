@@ -108,6 +108,8 @@ function FixedCanvas({
       titles={comp.titles}
       titleMode={comp.titleMode}
       titleSeed={comp.titleSeed}
+      titleAmplitude={comp.titleAmplitude}
+      titlePhase={comp.titlePhase}
       titleSizePx={comp.titleSizePx}
       titleColor={comp.titleColor}
       titleSizeMode={comp.titleSizeMode}
