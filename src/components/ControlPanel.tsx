@@ -18,7 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { newSeed, resolveWave } from "@/lib/engine";
 import { cn } from "@/lib/utils";
-import { forwardRef, useEffect, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface Props {
   comp: Composition;
@@ -67,7 +67,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
       </CollapsibleTrigger>
       <CollapsibleContent>
-        <div className="space-y-3 px-4 pb-4">{children}</div>
+        <div className="space-y-4 px-4 pb-4">{children}</div>
       </CollapsibleContent>
     </Collapsible>
   );
@@ -171,24 +171,55 @@ function RerollButton({
   );
 }
 
+function FieldLabel({ label, descriptor }: { label: string; descriptor?: string }) {
+  return (
+    <div className="space-y-0.5">
+      <Label className="text-xs">{label}</Label>
+      {descriptor && <div className="text-xs text-muted-foreground">{descriptor}</div>}
+    </div>
+  );
+}
+
 function ColorField({
   label,
+  descriptor,
   value,
   onChange,
 }: {
   label: string;
+  descriptor?: string;
   value: string;
   onChange: (v: string) => void;
 }) {
+  const [text, setText] = useState(value);
+  useEffect(() => setText(value), [value]);
+  const commit = (v: string) => {
+    const s = v.startsWith("#") ? v : `#${v}`;
+    if (/^#[0-9a-fA-F]{6}$/.test(s)) onChange(s.toLowerCase());
+  };
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs">{label}</Label>
-      <input
-        type="color"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
-      />
+      <FieldLabel label={label} descriptor={descriptor} />
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-12 shrink-0 cursor-pointer rounded-md border border-input bg-background"
+        />
+        <input
+          type="text"
+          value={text}
+          spellCheck={false}
+          onChange={(e) => {
+            setText(e.target.value);
+            commit(e.target.value);
+          }}
+          onBlur={() => setText(value)}
+          className="h-9 w-full rounded-md border border-input bg-background px-2 font-mono text-xs uppercase"
+          placeholder="#000000"
+        />
+      </div>
     </div>
   );
 }
@@ -385,15 +416,6 @@ export function ControlPanel({
                   onChange={onUploadSplit}
                   className="hidden"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={comp.images.length >= 5}
-                  onClick={() => splitFileRef.current?.click()}
-                >
-                  <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
-                </Button>
                 {comp.images.length > 0 && (
                   <div className="space-y-2">
                     {comp.images.map((im, i) => (
@@ -420,13 +442,21 @@ export function ControlPanel({
                     ))}
                   </div>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={comp.images.length >= 5}
+                  onClick={() => splitFileRef.current?.click()}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
+                </Button>
                 {comp.template === "A" && (
                   <SegmentedControl
                     options={["half", "span"] as SplitStyle[]}
                     value={comp.splitStyle}
                     onChange={(s) => update({ splitStyle: s })}
                     columns={2}
-                    size="sm"
                     getLabel={(s) => (s === "half" ? "Half" : "Span")}
                   />
                 )}
@@ -437,7 +467,6 @@ export function ControlPanel({
                     value={comp.splitOrder}
                     onChange={(o) => update({ splitOrder: o })}
                     columns={2}
-                    size="sm"
                     getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
                   />
                 )}
@@ -477,14 +506,6 @@ export function ControlPanel({
                   onChange={onUploadMulti}
                   className="hidden"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => multiFileRef.current?.click()}
-                >
-                  <Plus className="mr-1 h-4 w-4" /> Add images
-                </Button>
                 {comp.images.length > 0 && (
                   <div className="space-y-2">
                     {comp.images.map((im, i) => (
@@ -511,6 +532,14 @@ export function ControlPanel({
                     ))}
                   </div>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => multiFileRef.current?.click()}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add images
+                </Button>
                 <div className="flex items-center justify-between pt-1">
                   <Label className="text-xs">Animate</Label>
                   <div className="flex items-center gap-1">
@@ -580,35 +609,6 @@ export function ControlPanel({
           </>
         )}
       </Section>
-
-      {!isFreeform && (
-        <Section title="Colors">
-          <div className="grid grid-cols-2 gap-3">
-            <ColorField
-              label="Background"
-              value={comp.background}
-              onChange={(v) => update({ background: v })}
-            />
-            <ColorField
-              label="Title"
-              value={comp.titleColor}
-              onChange={(v) => update({ titleColor: v })}
-            />
-            {TEMPLATE_CAPTIONS[comp.template].map((slot) => (
-              <ColorField
-                key={slot.key}
-                label={`${slot.label} color`}
-                value={comp.captionColors[slot.key as CaptionKey]}
-                onChange={(v) =>
-                  update({
-                    captionColors: { ...comp.captionColors, [slot.key]: v },
-                  })
-                }
-              />
-            ))}
-          </div>
-        </Section>
-      )}
 
       <Section title="Titles">
         <div className="space-y-2">
@@ -748,8 +748,8 @@ export function ControlPanel({
               const hidden = comp.captionHidden[slot.key];
               return (
                 <div key={slot.key} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-xs">{slot.label}</Label>
+                  <div className="flex items-start justify-between">
+                    <FieldLabel label={slot.label} descriptor={slot.descriptor} />
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -799,6 +799,36 @@ export function ControlPanel({
                 </div>
               );
             })}
+          </div>
+        </Section>
+      )}
+
+      {!isFreeform && (
+        <Section title="Colors">
+          <div className="space-y-3">
+            <ColorField
+              label="Background"
+              value={comp.background}
+              onChange={(v) => update({ background: v })}
+            />
+            <ColorField
+              label="Title"
+              value={comp.titleColor}
+              onChange={(v) => update({ titleColor: v })}
+            />
+            {TEMPLATE_CAPTIONS[comp.template].map((slot) => (
+              <ColorField
+                key={slot.key}
+                label={slot.label}
+                descriptor={slot.descriptor}
+                value={comp.captionColors[slot.key as CaptionKey]}
+                onChange={(v) =>
+                  update({
+                    captionColors: { ...comp.captionColors, [slot.key]: v },
+                  })
+                }
+              />
+            ))}
           </div>
         </Section>
       )}
