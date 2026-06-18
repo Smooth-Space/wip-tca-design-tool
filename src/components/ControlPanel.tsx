@@ -457,7 +457,6 @@ export function ControlPanel({
                     value={comp.splitStyle}
                     onChange={(s) => update({ splitStyle: s })}
                     columns={2}
-                    size="sm"
                     getLabel={(s) => (s === "half" ? "Half" : "Span")}
                   />
                 )}
@@ -468,7 +467,6 @@ export function ControlPanel({
                     value={comp.splitOrder}
                     onChange={(o) => update({ splitOrder: o })}
                     columns={2}
-                    size="sm"
                     getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
                   />
                 )}
