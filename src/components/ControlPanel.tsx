@@ -1,4 +1,11 @@
-import type { Composition, Format, Mode, Template, SplitOrder, CaptionKey } from "@/lib/composition";
+import type {
+  Composition,
+  Format,
+  Mode,
+  Template,
+  SplitOrder,
+  CaptionKey,
+} from "@/lib/composition";
 import { TEMPLATE_CAPTIONS, TEMPLATE_VARIANTS, PLACEHOLDER_SRC } from "@/lib/composition";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -7,11 +14,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Plus, X, RefreshCw, ChevronDown, Play, Pause, Eye, EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { newSeed, resolveWave } from "@/lib/engine";
 import { cn } from "@/lib/utils";
 import { forwardRef, useEffect, useRef } from "react";
@@ -225,8 +228,7 @@ export function ControlPanel({
 
   const usesImage = comp.variant === "split" || comp.variant === "full";
   const isFreeform = comp.template === "freeform";
-  const lineCount =
-    comp.template === "D" ? 0 : comp.titles[0]?.text.split("\n").length ?? 1;
+  const lineCount = comp.template === "D" ? 0 : (comp.titles[0]?.text.split("\n").length ?? 1);
 
   const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -253,13 +255,11 @@ export function ControlPanel({
     if (files.length === 0) return;
     e.target.value = "";
     Promise.all(
-      files.map(
-        async (file) => {
-          const url = await fileToDataUrl(file);
-          const { naturalWidth, naturalHeight } = await loadDimensions(url);
-          return { id: crypto.randomUUID(), src: url, naturalWidth, naturalHeight };
-        },
-      ),
+      files.map(async (file) => {
+        const url = await fileToDataUrl(file);
+        const { naturalWidth, naturalHeight } = await loadDimensions(url);
+        return { id: crypto.randomUUID(), src: url, naturalWidth, naturalHeight };
+      }),
     ).then((items) => {
       setComp((c) => ({ ...c, images: [...c.images, ...items] }));
     });
@@ -285,14 +285,14 @@ export function ControlPanel({
       <h1 className="text-lg font-semibold">Composer</h1>
 
       {!isFreeform && (
-      <Section title="Format">
-        <SegmentedControl
-          options={FORMATS}
-          value={comp.format}
-          onChange={(f) => update({ format: f })}
-          columns={3}
-        />
-      </Section>
+        <Section title="Format">
+          <SegmentedControl
+            options={FORMATS}
+            value={comp.format}
+            onChange={(f) => update({ format: f })}
+            columns={3}
+          />
+        </Section>
       )}
 
       <Section title="Template">
@@ -322,280 +322,280 @@ export function ControlPanel({
         />
 
         {!isFreeform && (
-        <>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs">Variant</Label>
-            {comp.variant === "multi" && (
-              <RerollButton
-                onClick={() => update({ multiSeed: newSeed() })}
-                tooltip="Reroll layout"
-              />
-            )}
-          </div>
-          <SegmentedControl
-            options={TEMPLATE_VARIANTS[comp.template]}
-            value={comp.variant}
-            onChange={(v) => update({ variant: v })}
-            columns={4}
-            capitalize
-          />
-        </div>
-
-        {comp.variant === "full" && (
-          <div className="space-y-3 pt-1">
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              onChange={onUpload}
-              className="hidden"
-            />
-            <div className="flex items-center gap-3">
-              <img
-                src={comp.images[0]?.src ?? PLACEHOLDER_SRC}
-                alt=""
-                className="h-14 w-14 shrink-0 rounded-md border border-border object-cover"
-              />
-              <div className="flex flex-1 flex-col gap-1.5">
-                <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
-                  Upload / Replace
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={!comp.images[0]}
-                  onClick={() => update({ images: [] })}
-                >
-                  Remove
-                </Button>
+          <>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Variant</Label>
+                {comp.variant === "multi" && (
+                  <RerollButton
+                    onClick={() => update({ multiSeed: newSeed() })}
+                    tooltip="Reroll layout"
+                  />
+                )}
               </div>
-            </div>
-          </div>
-        )}
-
-        {comp.variant === "split" && (
-          <div className="space-y-3 pt-1">
-            <input
-              ref={splitFileRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={onUploadSplit}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              disabled={comp.images.length >= 5}
-              onClick={() => splitFileRef.current?.click()}
-            >
-              <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
-            </Button>
-            {comp.images.length > 0 && (
-              <div className="space-y-2">
-                {comp.images.map((im, i) => (
-                  <div key={im.id} className="flex items-center gap-2">
-                    <img
-                      src={im.src}
-                      alt=""
-                      className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
-                    />
-                    <span className="flex-1 text-xs text-muted-foreground">
-                      {i === 0 ? "First (static)" : `Image ${i + 1}`}
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() =>
-                        update({ images: comp.images.filter((x) => x.id !== im.id) })
-                      }
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-            {(comp.template === "A" || comp.template === "B") && (
               <SegmentedControl
-                options={["image-first", "title-first"] as SplitOrder[]}
-                value={comp.splitOrder}
-                onChange={(o) => update({ splitOrder: o })}
-                columns={2}
-                size="sm"
-                getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
+                options={TEMPLATE_VARIANTS[comp.template]}
+                value={comp.variant}
+                onChange={(v) => update({ variant: v })}
+                columns={4}
+                capitalize
               />
-            )}
-            <div className="flex items-center justify-between pt-1">
-              <Label className="text-xs">Animate</Label>
-              <div className="flex items-center gap-1">
-                {comp.animate && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7"
-                    onClick={() => update({ animPlaying: !comp.animPlaying })}
-                  >
-                    {comp.animPlaying ? (
-                      <Pause className="h-4 w-4" />
-                    ) : (
-                      <Play className="h-4 w-4" />
-                    )}
-                  </Button>
-                )}
-                <Switch
-                  checked={comp.animate}
-                  onCheckedChange={(v) => update({ animate: v })}
-                />
-              </div>
             </div>
-          </div>
-        )}
 
-        {comp.variant === "multi" && (
-          <div className="space-y-3 pt-1">
-            <input
-              ref={multiFileRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={onUploadMulti}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full"
-              onClick={() => multiFileRef.current?.click()}
-            >
-              <Plus className="mr-1 h-4 w-4" /> Add images
-            </Button>
-            {comp.images.length > 0 && (
-              <div className="space-y-2">
-                {comp.images.map((im, i) => (
-                  <div key={im.id} className="flex items-center gap-2">
-                    <img
-                      src={im.src}
-                      alt=""
-                      className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
-                    />
-                    <span className="flex-1 text-xs text-muted-foreground">
-                      {i < 3 ? `Shown ${i + 1}` : "Stored (not shown)"}
-                    </span>
+            {comp.variant === "full" && (
+              <div className="space-y-3 pt-1">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={onUpload}
+                  className="hidden"
+                />
+                <div className="flex items-center gap-3">
+                  <img
+                    src={comp.images[0]?.src ?? PLACEHOLDER_SRC}
+                    alt=""
+                    className="h-14 w-14 shrink-0 rounded-md border border-border object-cover"
+                  />
+                  <div className="flex flex-1 flex-col gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => fileRef.current?.click()}>
+                      Upload / Replace
+                    </Button>
                     <Button
                       variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() =>
-                        update({ images: comp.images.filter((x) => x.id !== im.id) })
-                      }
+                      size="sm"
+                      disabled={!comp.images[0]}
+                      onClick={() => update({ images: [] })}
                     >
-                      <X className="h-4 w-4" />
+                      Remove
                     </Button>
                   </div>
-                ))}
+                </div>
               </div>
             )}
-            <div className="flex items-center justify-between pt-1">
-              <Label className="text-xs">Animate</Label>
-              <div className="flex items-center gap-1">
-                {comp.animate && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => update({ animPlaying: !comp.animPlaying })}
-                    >
-                      {comp.animPlaying ? (
-                        <Pause className="h-4 w-4" />
-                      ) : (
-                        <Play className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <RerollButton
-                      onClick={() => update({ animSeed: newSeed() })}
-                      tooltip="Reroll animation"
-                    />
-                  </>
-                )}
-                <Switch
-                  checked={comp.animate}
-                  onCheckedChange={(v) => update({ animate: v })}
+
+            {comp.variant === "split" && (
+              <div className="space-y-3 pt-1">
+                <input
+                  ref={splitFileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={onUploadSplit}
+                  className="hidden"
                 />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={comp.images.length >= 5}
+                  onClick={() => splitFileRef.current?.click()}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
+                </Button>
+                {comp.images.length > 0 && (
+                  <div className="space-y-2">
+                    {comp.images.map((im, i) => (
+                      <div key={im.id} className="flex items-center gap-2">
+                        <img
+                          src={im.src}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
+                        />
+                        <span className="flex-1 text-xs text-muted-foreground">
+                          {i === 0 ? "First (static)" : `Image ${i + 1}`}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0"
+                          onClick={() =>
+                            update({ images: comp.images.filter((x) => x.id !== im.id) })
+                          }
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {(comp.template === "A" || comp.template === "B") && (
+                  <SegmentedControl
+                    options={["image-first", "title-first"] as SplitOrder[]}
+                    value={comp.splitOrder}
+                    onChange={(o) => update({ splitOrder: o })}
+                    columns={2}
+                    size="sm"
+                    getLabel={(o) => (o === "image-first" ? "Image first" : "Title first")}
+                  />
+                )}
+                <div className="flex items-center justify-between pt-1">
+                  <Label className="text-xs">Animate</Label>
+                  <div className="flex items-center gap-1">
+                    {comp.animate && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7"
+                        onClick={() => update({ animPlaying: !comp.animPlaying })}
+                      >
+                        {comp.animPlaying ? (
+                          <Pause className="h-4 w-4" />
+                        ) : (
+                          <Play className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                    <Switch
+                      checked={comp.animate}
+                      onCheckedChange={(v) => update({ animate: v })}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-            {comp.animate && (
+            )}
+
+            {comp.variant === "multi" && (
+              <div className="space-y-3 pt-1">
+                <input
+                  ref={multiFileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={onUploadMulti}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => multiFileRef.current?.click()}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add images
+                </Button>
+                {comp.images.length > 0 && (
+                  <div className="space-y-2">
+                    {comp.images.map((im, i) => (
+                      <div key={im.id} className="flex items-center gap-2">
+                        <img
+                          src={im.src}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-md border border-border object-cover"
+                        />
+                        <span className="flex-1 text-xs text-muted-foreground">
+                          {i < 3 ? `Shown ${i + 1}` : "Stored (not shown)"}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0"
+                          onClick={() =>
+                            update({ images: comp.images.filter((x) => x.id !== im.id) })
+                          }
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between pt-1">
+                  <Label className="text-xs">Animate</Label>
+                  <div className="flex items-center gap-1">
+                    {comp.animate && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => update({ animPlaying: !comp.animPlaying })}
+                        >
+                          {comp.animPlaying ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4" />
+                          )}
+                        </Button>
+                        <RerollButton
+                          onClick={() => update({ animSeed: newSeed() })}
+                          tooltip="Reroll animation"
+                        />
+                      </>
+                    )}
+                    <Switch
+                      checked={comp.animate}
+                      onCheckedChange={(v) => update({ animate: v })}
+                    />
+                  </div>
+                </div>
+                {comp.animate && (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs">Globe size</Label>
+                      <span className="text-xs text-muted-foreground">
+                        {comp.globeScale.toFixed(2)}×
+                      </span>
+                    </div>
+                    <Slider
+                      min={1.0}
+                      max={2.0}
+                      step={0.05}
+                      value={[comp.globeScale]}
+                      onValueChange={([v]) => update({ globeScale: v })}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {(usesImage || comp.variant === "multi") && (
               <div className="space-y-2 pt-1">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs">Globe size</Label>
+                  <Label className="text-xs">Image overlay</Label>
                   <span className="text-xs text-muted-foreground">
-                    {comp.globeScale.toFixed(2)}×
+                    {Math.round(comp.imageOverlay * 100)}%
                   </span>
                 </div>
                 <Slider
-                  min={1.0}
-                  max={2.0}
-                  step={0.05}
-                  value={[comp.globeScale]}
-                  onValueChange={([v]) => update({ globeScale: v })}
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={[Math.round(comp.imageOverlay * 100)]}
+                  onValueChange={([v]) => update({ imageOverlay: v / 100 })}
                 />
               </div>
             )}
-          </div>
-        )}
-
-        {(usesImage || comp.variant === "multi") && (
-          <div className="space-y-2 pt-1">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs">Image overlay</Label>
-              <span className="text-xs text-muted-foreground">
-                {Math.round(comp.imageOverlay * 100)}%
-              </span>
-            </div>
-            <Slider
-              min={0}
-              max={100}
-              step={1}
-              value={[Math.round(comp.imageOverlay * 100)]}
-              onValueChange={([v]) => update({ imageOverlay: v / 100 })}
-            />
-          </div>
-        )}
-        </>
+          </>
         )}
       </Section>
 
       {!isFreeform && (
-      <Section title="Colors">
-        <div className="grid grid-cols-2 gap-3">
-          <ColorField
-            label="Background"
-            value={comp.background}
-            onChange={(v) => update({ background: v })}
-          />
-          <ColorField
-            label="Title"
-            value={comp.titleColor}
-            onChange={(v) => update({ titleColor: v })}
-          />
-          {TEMPLATE_CAPTIONS[comp.template].map((slot) => (
+        <Section title="Colors">
+          <div className="grid grid-cols-2 gap-3">
             <ColorField
-              key={slot.key}
-              label={`${slot.label} color`}
-              value={comp.captionColors[slot.key as CaptionKey]}
-              onChange={(v) =>
-                update({
-                  captionColors: { ...comp.captionColors, [slot.key]: v },
-                })
-              }
+              label="Background"
+              value={comp.background}
+              onChange={(v) => update({ background: v })}
             />
-          ))}
-        </div>
-      </Section>
+            <ColorField
+              label="Title"
+              value={comp.titleColor}
+              onChange={(v) => update({ titleColor: v })}
+            />
+            {TEMPLATE_CAPTIONS[comp.template].map((slot) => (
+              <ColorField
+                key={slot.key}
+                label={`${slot.label} color`}
+                value={comp.captionColors[slot.key as CaptionKey]}
+                onChange={(v) =>
+                  update({
+                    captionColors: { ...comp.captionColors, [slot.key]: v },
+                  })
+                }
+              />
+            ))}
+          </div>
+        </Section>
       )}
 
       <Section title="Titles">
@@ -604,7 +604,9 @@ export function ControlPanel({
             <Label className="text-xs">Mode</Label>
             <RerollButton
               disabled={comp.titleMode === "mixed"}
-              onClick={() => update({ titleSeed: newSeed(), titleAmplitude: null, titlePhase: null })}
+              onClick={() =>
+                update({ titleSeed: newSeed(), titleAmplitude: null, titlePhase: null })
+              }
               tooltip={comp.titleMode === "mixed" ? "No randomness in Mixed mode" : "Reroll type"}
             />
           </div>
@@ -700,9 +702,7 @@ export function ControlPanel({
                 <Label className="text-xs text-muted-foreground">Fit width</Label>
                 <Switch
                   checked={comp.titleSizeMode === "fit"}
-                  onCheckedChange={(v) =>
-                    update({ titleSizeMode: v ? "fit" : "fixed" })
-                  }
+                  onCheckedChange={(v) => update({ titleSizeMode: v ? "fit" : "fixed" })}
                 />
               </div>
             )}
@@ -729,66 +729,66 @@ export function ControlPanel({
       </Section>
 
       {!isFreeform && (
-      <Section title="Text">
-        <div className="space-y-2">
-          {TEMPLATE_CAPTIONS[comp.template].map((slot) => {
-            const isEmpty = (comp.captions[slot.key] ?? "") === "";
-            const hidden = comp.captionHidden[slot.key];
-            return (
-              <div key={slot.key} className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs">{slot.label}</Label>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="block">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            disabled={!isEmpty}
-                            onClick={() =>
-                              update({
-                                captionHidden: { ...comp.captionHidden, [slot.key]: !hidden },
-                              })
-                            }
-                          >
-                            {hidden ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {!isEmpty
-                          ? "Clear the text to hide this field"
-                          : hidden
-                            ? "Show field"
-                            : "Hide field"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+        <Section title="Text">
+          <div className="space-y-2">
+            {TEMPLATE_CAPTIONS[comp.template].map((slot) => {
+              const isEmpty = (comp.captions[slot.key] ?? "") === "";
+              const hidden = comp.captionHidden[slot.key];
+              return (
+                <div key={slot.key} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs">{slot.label}</Label>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="block">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7"
+                              disabled={!isEmpty}
+                              onClick={() =>
+                                update({
+                                  captionHidden: { ...comp.captionHidden, [slot.key]: !hidden },
+                                })
+                              }
+                            >
+                              {hidden ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {!isEmpty
+                            ? "Clear the text to hide this field"
+                            : hidden
+                              ? "Show field"
+                              : "Hide field"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <AutoTextarea
+                    value={comp.captions[slot.key]}
+                    onChange={(e) =>
+                      update({ captions: { ...comp.captions, [slot.key]: e.target.value } })
+                    }
+                    placeholder={slot.label}
+                    rows={2}
+                    className={cn("resize-none", hidden && "opacity-50")}
+                    ref={(el) => {
+                      if (el) titleRefs.current.set(slot.key, el);
+                    }}
+                    onFocus={() => onSelectTitle?.(slot.key)}
+                  />
                 </div>
-                <AutoTextarea
-                  value={comp.captions[slot.key]}
-                  onChange={(e) =>
-                    update({ captions: { ...comp.captions, [slot.key]: e.target.value } })
-                  }
-                  placeholder={slot.label}
-                  rows={2}
-                  className={cn("resize-none", hidden && "opacity-50")}
-                  ref={(el) => {
-                    if (el) titleRefs.current.set(slot.key, el);
-                  }}
-                  onFocus={() => onSelectTitle?.(slot.key)}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </Section>
+              );
+            })}
+          </div>
+        </Section>
       )}
 
       <Section title="Export">
@@ -854,7 +854,14 @@ function DistributionViz({
       preserveAspectRatio="none"
       className="rounded-md border bg-muted/30 text-foreground"
     >
-      <line x1={pad} y1={H / 2} x2={W - pad} y2={H / 2} stroke="currentColor" strokeOpacity={0.15} />
+      <line
+        x1={pad}
+        y1={H / 2}
+        x2={W - pad}
+        y2={H / 2}
+        stroke="currentColor"
+        strokeOpacity={0.15}
+      />
       <polyline
         points={pts}
         fill="none"

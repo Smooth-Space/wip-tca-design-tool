@@ -70,16 +70,18 @@ export function TemplateA({
       const right = rowSlots.find((s) => s.column === "right");
       return (
         <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            [anchor]: 0,
-            padding: 40,
-            display: "flex",
-            gap: 40,
-            alignItems: anchor === "top" ? "flex-start" : "flex-end",
-          } as React.CSSProperties}
+          style={
+            {
+              position: "absolute",
+              left: 0,
+              right: 0,
+              [anchor]: 0,
+              padding: 40,
+              display: "flex",
+              gap: 40,
+              alignItems: anchor === "top" ? "flex-start" : "flex-end",
+            } as React.CSSProperties
+          }
         >
           <div style={{ flex: 1, minWidth: 0 }}>
             {left && (
@@ -88,7 +90,7 @@ export function TemplateA({
                 color={comp.captionColors[left.key]}
                 align="left"
                 captionKey={left.key}
-              hidden={comp.captionHidden[left.key]}
+                hidden={comp.captionHidden[left.key]}
               />
             )}
           </div>
@@ -99,7 +101,7 @@ export function TemplateA({
                 color={comp.captionColors[right.key]}
                 align="left"
                 captionKey={right.key}
-              hidden={comp.captionHidden[right.key]}
+                hidden={comp.captionHidden[right.key]}
               />
             )}
           </div>
@@ -120,7 +122,14 @@ export function TemplateA({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        <BackgroundLayer comp={comp} w={w} h={h} imgSrc={imgSrc} multiPlacements={multiPlacements} sphereRef={sphereRef} />
+        <BackgroundLayer
+          comp={comp}
+          w={w}
+          h={h}
+          imgSrc={imgSrc}
+          multiPlacements={multiPlacements}
+          sphereRef={sphereRef}
+        />
       </div>
       <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
         <TemplateLayout

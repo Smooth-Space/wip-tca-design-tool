@@ -1,14 +1,24 @@
-export interface ImgAspect { id: string; naturalWidth: number; naturalHeight: number; }
-export interface Placement { id: string; x: number; y: number; width: number; height: number; }
+export interface ImgAspect {
+  id: string;
+  naturalWidth: number;
+  naturalHeight: number;
+}
+export interface Placement {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 const P = {
-  primaryLongEdge: 0.46,    // hero size (fraction of max(W,H))
-  secondaryLongEdge: 0.28,  // supporting images
+  primaryLongEdge: 0.46, // hero size (fraction of max(W,H))
+  secondaryLongEdge: 0.28, // supporting images
   sizeJitter: 0.06,
-  edgeBleed: 0.15,          // max fraction of a box off-canvas
-  minGapFrac: 0.02,         // min gap between images — no overlap
-  posJitter: 0.10,          // vertical jitter within a zone
-  maxBandFrac: 0.38,        // central clearance is random in [0, maxBandFrac*H] each reroll
+  edgeBleed: 0.15, // max fraction of a box off-canvas
+  minGapFrac: 0.02, // min gap between images — no overlap
+  posJitter: 0.1, // vertical jitter within a zone
+  maxBandFrac: 0.38, // central clearance is random in [0, maxBandFrac*H] each reroll
 };
 
 function makeRng(seed: number) {
@@ -25,7 +35,7 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 function sizeFor(im: ImgAspect, frac: number, longRef: number) {
   const box = frac * longRef;
-  const ar = (im.naturalWidth && im.naturalHeight) ? im.naturalWidth / im.naturalHeight : 1;
+  const ar = im.naturalWidth && im.naturalHeight ? im.naturalWidth / im.naturalHeight : 1;
   return ar >= 1 ? { w: box, h: box / ar } : { w: box * ar, h: box };
 }
 function szFrac(base: number, rng: () => number) {
@@ -42,14 +52,24 @@ function separate(ps: Placement[], W: number, iterations = 6) {
   for (let it = 0; it < iterations; it++) {
     for (let i = 0; i < ps.length; i++) {
       for (let j = i + 1; j < ps.length; j++) {
-        const a = ps[i], b = ps[j];
-        const ax = a.x + a.width / 2, ay = a.y + a.height / 2;
-        const bx = b.x + b.width / 2, by = b.y + b.height / 2;
+        const a = ps[i],
+          b = ps[j];
+        const ax = a.x + a.width / 2,
+          ay = a.y + a.height / 2;
+        const bx = b.x + b.width / 2,
+          by = b.y + b.height / 2;
         const ox = (a.width + b.width) / 2 + gap - Math.abs(ax - bx);
         const oy = (a.height + b.height) / 2 + gap - Math.abs(ay - by);
         if (ox > 0 && oy > 0) {
-          if (ox < oy) { const push = (ox / 2) * (ax < bx ? -1 : 1); a.x += push; b.x -= push; }
-          else { const push = (oy / 2) * (ay < by ? -1 : 1); a.y += push; b.y -= push; }
+          if (ox < oy) {
+            const push = (ox / 2) * (ax < bx ? -1 : 1);
+            a.x += push;
+            b.x -= push;
+          } else {
+            const push = (oy / 2) * (ay < by ? -1 : 1);
+            a.y += push;
+            b.y -= push;
+          }
         }
       }
     }
@@ -58,10 +78,12 @@ function separate(ps: Placement[], W: number, iterations = 6) {
 
 export function computeMultiLayout(
   images: ImgAspect[],
-  W: number, H: number,
-  titleRows: number, titleSizePx: number,   // kept for signature compatibility (unused now)
+  W: number,
+  H: number,
+  titleRows: number,
+  titleSizePx: number, // kept for signature compatibility (unused now)
   seed: number,
-  clearOverride?: number,                    // fraction of H; if set, fixes the band (Template D passes 0)
+  clearOverride?: number, // fraction of H; if set, fixes the band (Template D passes 0)
 ): Placement[] {
   const imgs = images.slice(0, 3);
   if (imgs.length === 0) return [];
@@ -74,9 +96,9 @@ export function computeMultiLayout(
   const bandBottom = bandTop + bandH;
 
   const hero = Math.floor(rng() * imgs.length);
-  const others = imgs.map((_, i) => i).filter(i => i !== hero);
-  const heroTop = rng() < 0.5;     // hero's zone
-  const heroLeft = rng() < 0.5;    // hero's anchor edge
+  const others = imgs.map((_, i) => i).filter((i) => i !== hero);
+  const heroTop = rng() < 0.5; // hero's zone
+  const heroLeft = rng() < 0.5; // hero's anchor edge
 
   const out: Placement[] = [];
 
@@ -96,7 +118,7 @@ export function computeMultiLayout(
     const zTop = heroTop ? bandBottom : 0;
     const zBot = heroTop ? H : bandTop;
     const leftFirst = rng() < 0.5;
-    const cols = leftFirst ? [0.20, 0.80] : [0.80, 0.20];
+    const cols = leftFirst ? [0.2, 0.8] : [0.8, 0.2];
     const hts = leftFirst ? [0.32, 0.66] : [0.66, 0.32]; // staggered, paired to the side
     others.forEach((idx, k) => {
       const { w, h } = sizeFor(imgs[idx], szFrac(P.secondaryLongEdge, rng), longRef);

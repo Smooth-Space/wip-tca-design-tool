@@ -129,9 +129,7 @@ export const MultiSphere = forwardRef<MultiSphereHandle, Props>(function MultiSp
     const dims = points.map((_, i) => {
       const im = images[i % images.length];
       const ar =
-        im && im.naturalWidth > 0 && im.naturalHeight > 0
-          ? im.naturalWidth / im.naturalHeight
-          : 1;
+        im && im.naturalWidth > 0 && im.naturalHeight > 0 ? im.naturalWidth / im.naturalHeight : 1;
       let tw: number, th: number;
       if (ar >= 1) {
         tw = TILE_SIZE;
@@ -298,7 +296,13 @@ export const MultiSphere = forwardRef<MultiSphereHandle, Props>(function MultiSp
     <div
       ref={mountRef}
       data-anim="true"
-      style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     />
   );
 });

@@ -1,9 +1,4 @@
-import {
-  CAPTION_FONT,
-  CAPTION_LINE_HEIGHT,
-  CAPTION_SIZE_PX,
-  CAPTION_VARIATION,
-} from "@/lib/typo";
+import { CAPTION_FONT, CAPTION_LINE_HEIGHT, CAPTION_SIZE_PX, CAPTION_VARIATION } from "@/lib/typo";
 import type { CaptionKey } from "@/lib/composition";
 import { useSelectable } from "@/components/SelectionContext";
 
@@ -45,11 +40,7 @@ export function Caption({
         ...style,
       }}
     >
-      {isEmpty && captionKey && !hideSelection ? (
-        <span style={{ opacity: 0.3 }}>Text</span>
-      ) : (
-        text
-      )}
+      {isEmpty && captionKey && !hideSelection ? <span style={{ opacity: 0.3 }}>Text</span> : text}
     </div>
   );
 }

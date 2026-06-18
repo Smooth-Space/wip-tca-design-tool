@@ -9,6 +9,10 @@ export type Template = "A" | "B" | "C" | "D" | "freeform";
 
 export type CaptionKey = "text1" | "text2" | "text3" | "text4";
 
+export type Captions = Record<CaptionKey, string>;
+export type CaptionColors = Record<CaptionKey, string>;
+export type CaptionFlags = Record<CaptionKey, boolean>;
+
 export interface CaptionSlot {
   key: CaptionKey;
   anchor: "top" | "bottom" | "middle";
@@ -21,20 +25,56 @@ export const TEMPLATE_CAPTIONS: Record<Template, CaptionSlot[]> = {
   A: [
     { key: "text1", anchor: "top", column: "left", align: "left", label: "Text 1 (top-left)" },
     { key: "text2", anchor: "top", column: "right", align: "left", label: "Text 2 (top-right)" },
-    { key: "text3", anchor: "bottom", column: "left", align: "left", label: "Text 3 (bottom-left)" },
-    { key: "text4", anchor: "bottom", column: "right", align: "left", label: "Text 4 (bottom-right)" },
+    {
+      key: "text3",
+      anchor: "bottom",
+      column: "left",
+      align: "left",
+      label: "Text 3 (bottom-left)",
+    },
+    {
+      key: "text4",
+      anchor: "bottom",
+      column: "right",
+      align: "left",
+      label: "Text 4 (bottom-right)",
+    },
   ],
   B: [
     { key: "text1", anchor: "top", column: "left", align: "left", label: "Text 1 (top-left)" },
     { key: "text2", anchor: "top", column: "right", align: "right", label: "Text 2 (top-right)" },
-    { key: "text3", anchor: "bottom", column: "left", align: "left", label: "Text 3 (bottom-left)" },
-    { key: "text4", anchor: "bottom", column: "right", align: "right", label: "Text 4 (bottom-right)" },
+    {
+      key: "text3",
+      anchor: "bottom",
+      column: "left",
+      align: "left",
+      label: "Text 3 (bottom-left)",
+    },
+    {
+      key: "text4",
+      anchor: "bottom",
+      column: "right",
+      align: "right",
+      label: "Text 4 (bottom-right)",
+    },
   ],
   C: [
     { key: "text1", anchor: "top", column: "left", align: "left", label: "Text 1 (top-left)" },
     { key: "text2", anchor: "top", column: "right", align: "left", label: "Text 2 (top-right)" },
-    { key: "text3", anchor: "bottom", column: "left", align: "left", label: "Text 3 (bottom-left)" },
-    { key: "text4", anchor: "bottom", column: "right", align: "left", label: "Text 4 (bottom-right)" },
+    {
+      key: "text3",
+      anchor: "bottom",
+      column: "left",
+      align: "left",
+      label: "Text 3 (bottom-left)",
+    },
+    {
+      key: "text4",
+      anchor: "bottom",
+      column: "right",
+      align: "left",
+      label: "Text 4 (bottom-right)",
+    },
   ],
   D: [
     { key: "text1", anchor: "middle", column: "left", align: "left", label: "Text 1" },
@@ -88,9 +128,9 @@ export interface Composition {
   animPlaying: boolean;
   globeScale: number;
   imageOverlay: number;
-  captions: { text1: string; text2: string; text3: string; text4: string };
-  captionColors: { text1: string; text2: string; text3: string; text4: string };
-  captionHidden: { text1: boolean; text2: boolean; text3: boolean; text4: boolean };
+  captions: Captions;
+  captionColors: CaptionColors;
+  captionHidden: CaptionFlags;
 }
 
 export const defaultComposition: Composition = {

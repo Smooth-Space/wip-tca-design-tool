@@ -19,13 +19,7 @@ export function CoverImage({ src }: { src: string }) {
 }
 
 // The black overlay div. Renders null when opacity <= 0.
-export function Overlay({
-  opacity,
-  style,
-}: {
-  opacity: number;
-  style?: React.CSSProperties;
-}) {
+export function Overlay({ opacity, style }: { opacity: number; style?: React.CSSProperties }) {
   if (opacity <= 0) return null;
   return <div style={{ position: "absolute", background: "#000", opacity, ...style }} />;
 }
