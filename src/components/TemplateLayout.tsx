@@ -51,8 +51,18 @@ function CaptionRow({
         alignItems: anchor === "top" ? "flex-start" : "flex-end",
       }}
     >
-      <CaptionCell slot={left} captions={captions} captionColors={captionColors} captionHidden={captionHidden} />
-      <CaptionCell slot={right} captions={captions} captionColors={captionColors} captionHidden={captionHidden} />
+      <CaptionCell
+        slot={left}
+        captions={captions}
+        captionColors={captionColors}
+        captionHidden={captionHidden}
+      />
+      <CaptionCell
+        slot={right}
+        captions={captions}
+        captionColors={captionColors}
+        captionHidden={captionHidden}
+      />
     </div>
   );
 }
@@ -83,9 +93,21 @@ export function TemplateLayout({
         gap,
       }}
     >
-      <CaptionRow slots={slots} captions={captions} captionColors={captionColors} captionHidden={captionHidden} anchor="top" />
+      <CaptionRow
+        slots={slots}
+        captions={captions}
+        captionColors={captionColors}
+        captionHidden={captionHidden}
+        anchor="top"
+      />
       <div style={{ flex: 1, minHeight: 0, position: "relative" }}>{children}</div>
-      <CaptionRow slots={slots} captions={captions} captionColors={captionColors} captionHidden={captionHidden} anchor="bottom" />
+      <CaptionRow
+        slots={slots}
+        captions={captions}
+        captionColors={captionColors}
+        captionHidden={captionHidden}
+        anchor="bottom"
+      />
     </div>
   );
 }

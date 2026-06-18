@@ -1,9 +1,7 @@
 export type Axes = { wght: number; SRFF: number; wdth: number };
 export type Mode = "light" | "mixed" | "heavy";
 
-type AxisSpec =
-  | { kind: "const"; value: number }
-  | { kind: "lerp"; start: number; end: number };
+type AxisSpec = { kind: "const"; value: number } | { kind: "lerp"; start: number; end: number };
 
 interface ModeConfig {
   wdth: number; // constant 85 for all modes

@@ -13,7 +13,6 @@ export function TemplateBC({
   title,
   multiPlacements,
   sphereRef,
-
 }: {
   comp: Composition;
   w: number;
@@ -60,11 +59,25 @@ export function TemplateBC({
       </div>
     );
     const middle = (
-      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", gap: 40 }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 40,
+        }}
+      >
         {comp.splitOrder === "image-first" ? (
-          <>{imageHalf}{titleHalf}</>
+          <>
+            {imageHalf}
+            {titleHalf}
+          </>
         ) : (
-          <>{titleHalf}{imageHalf}</>
+          <>
+            {titleHalf}
+            {imageHalf}
+          </>
         )}
       </div>
     );
@@ -86,7 +99,14 @@ export function TemplateBC({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        <BackgroundLayer comp={comp} w={w} h={h} imgSrc={imgSrc} multiPlacements={multiPlacements} sphereRef={sphereRef} />
+        <BackgroundLayer
+          comp={comp}
+          w={w}
+          h={h}
+          imgSrc={imgSrc}
+          multiPlacements={multiPlacements}
+          sphereRef={sphereRef}
+        />
       </div>
       <div style={{ position: "absolute", inset: 0, zIndex: 1 }}>
         <TemplateLayout

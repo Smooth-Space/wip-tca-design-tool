@@ -57,19 +57,19 @@ export function FreeformCanvas({
         }}
       >
         <div style={{ width: areaWidth }}>
-        <TitleBlock
-          titles={comp.titles}
-          titleMode={comp.titleMode}
-          titleSeed={comp.titleSeed}
-          titleAmplitude={comp.titleAmplitude}
-          titlePhase={comp.titlePhase}
-          titleSizePx={comp.titleSizePx}
-          titleColor="#000000"
-          titleSizeMode={comp.titleSizeMode}
-          titleShift={comp.titleShift}
-          titleShiftSeed={comp.titleShiftSeed}
-          contentWidthPx={areaWidth}
-        />
+          <TitleBlock
+            titles={comp.titles}
+            titleMode={comp.titleMode}
+            titleSeed={comp.titleSeed}
+            titleAmplitude={comp.titleAmplitude}
+            titlePhase={comp.titlePhase}
+            titleSizePx={comp.titleSizePx}
+            titleColor="#000000"
+            titleSizeMode={comp.titleSizeMode}
+            titleShift={comp.titleShift}
+            titleShiftSeed={comp.titleShiftSeed}
+            contentWidthPx={areaWidth}
+          />
         </div>
       </div>
     </div>

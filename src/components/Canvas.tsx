@@ -67,14 +67,7 @@ function FixedCanvas({
 
   const multiPlacements = useMemo(
     () =>
-      computeMultiLayout(
-        comp.images,
-        w,
-        h,
-        comp.titles.length,
-        comp.titleSizePx,
-        comp.multiSeed,
-      ),
+      computeMultiLayout(comp.images, w, h, comp.titles.length, comp.titleSizePx, comp.multiSeed),
     [comp.images, w, h, comp.titles.length, comp.titleSizePx, comp.multiSeed],
   );
 

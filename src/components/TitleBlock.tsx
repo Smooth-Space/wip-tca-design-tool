@@ -121,9 +121,7 @@ export function TitleBlock({
         ...selectableStyle,
       }}
     >
-      {titles[0]?.text === "" && !hideSelection && (
-        <span style={{ opacity: 0.3 }}>Title</span>
-      )}
+      {titles[0]?.text === "" && !hideSelection && <span style={{ opacity: 0.3 }}>Title</span>}
       {fitEnabled && (
         <>
           {/* content-width reference (canvas inner width); measured in same scaled space */}

@@ -47,9 +47,7 @@ function buildLine(
   for (let i = 0; i < chars.length; i++) {
     const ch = chars[i];
     const a = axes[startIdx + i];
-    const variation = a
-      ? font.getVariation({ wght: a.wght, wdth: a.wdth, SRFF: a.SRFF })
-      : font;
+    const variation = a ? font.getVariation({ wght: a.wght, wdth: a.wdth, SRFF: a.SRFF }) : font;
     const run = variation.layout(ch);
     let advUnits = 0;
     for (let g = 0; g < run.glyphs.length; g++) {
@@ -84,9 +82,7 @@ function lineNaturalWidthFactor(
   let advUnits = 0;
   for (let i = 0; i < chars.length; i++) {
     const a = axes[startIdx + i];
-    const variation = a
-      ? font.getVariation({ wght: a.wght, wdth: a.wdth, SRFF: a.SRFF })
-      : font;
+    const variation = a ? font.getVariation({ wght: a.wght, wdth: a.wdth, SRFF: a.SRFF }) : font;
     const run = variation.layout(chars[i]);
     for (let g = 0; g < run.positions.length; g++) advUnits += run.positions[g].xAdvance;
   }

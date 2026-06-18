@@ -44,7 +44,11 @@ export function BackgroundLayer({
             globeScale={comp.globeScale}
           />
         ) : (
-          <MultiImages images={comp.images} placements={multiPlacements} imageOverlay={comp.imageOverlay} />
+          <MultiImages
+            images={comp.images}
+            placements={multiPlacements}
+            imageOverlay={comp.imageOverlay}
+          />
         )}
       </div>
     );

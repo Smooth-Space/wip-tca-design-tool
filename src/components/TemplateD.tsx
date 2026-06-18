@@ -23,11 +23,7 @@ function PinnedTitle({
     comp.titles[pin]?.id ?? null,
   );
   return (
-    <div
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-      style={selectableStyle}
-    >
+    <div onClick={handleClick} onDoubleClick={handleDoubleClick} style={selectableStyle}>
       {comp.titles[pin]?.text === "" && !hideSelection && (
         <span style={{ opacity: 0.3, color: comp.titleColor }}>Title</span>
       )}
@@ -53,7 +49,6 @@ export function TemplateD({
   h,
   imgSrc,
   sphereRef,
-
 }: {
   comp: Composition;
   w: number;
@@ -96,7 +91,14 @@ export function TemplateD({
   return (
     <div style={{ position: "absolute", inset: 0 }}>
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        <BackgroundLayer comp={comp} w={w} h={h} imgSrc={imgSrc} multiPlacements={multiPlacements} sphereRef={sphereRef} />
+        <BackgroundLayer
+          comp={comp}
+          w={w}
+          h={h}
+          imgSrc={imgSrc}
+          multiPlacements={multiPlacements}
+          sphereRef={sphereRef}
+        />
       </div>
 
       <div
@@ -110,12 +112,7 @@ export function TemplateD({
           gap: 40,
         }}
       >
-        <PinnedTitle
-          pin={0}
-          comp={comp}
-          dLines={dLines}
-          dAxes={dAxes}
-        />
+        <PinnedTitle pin={0} comp={comp} dLines={dLines} dAxes={dAxes} />
 
         <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
           {comp.variant === "split" && (
@@ -151,12 +148,7 @@ export function TemplateD({
           </div>
         </div>
 
-        <PinnedTitle
-          pin={1}
-          comp={comp}
-          dLines={dLines}
-          dAxes={dAxes}
-        />
+        <PinnedTitle pin={1} comp={comp} dLines={dLines} dAxes={dAxes} />
       </div>
     </div>
   );
