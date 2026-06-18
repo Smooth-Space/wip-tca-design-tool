@@ -76,6 +76,8 @@ export interface Composition {
   titleSizeMode: "fixed" | "fit";
   titleMode: Mode;
   titleSeed: number;
+  titleAmplitude: number | null;
+  titlePhase: number | null;
   titleShift: boolean;
   titleShiftSeed: number;
   images: ImageItem[];
