@@ -748,7 +748,7 @@ export function ControlPanel({
               const hidden = comp.captionHidden[slot.key];
               return (
                 <div key={slot.key} className="space-y-1">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-center justify-between">
                     <FieldLabel label={slot.label} descriptor={slot.descriptor} />
                     <TooltipProvider>
                       <Tooltip>
