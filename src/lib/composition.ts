@@ -9,6 +9,10 @@ export type Template = "A" | "B" | "C" | "D" | "freeform";
 
 export type CaptionKey = "text1" | "text2" | "text3" | "text4";
 
+export type Captions = Record<CaptionKey, string>;
+export type CaptionColors = Record<CaptionKey, string>;
+export type CaptionFlags = Record<CaptionKey, boolean>;
+
 export interface CaptionSlot {
   key: CaptionKey;
   anchor: "top" | "bottom" | "middle";
