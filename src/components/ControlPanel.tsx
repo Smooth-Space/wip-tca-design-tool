@@ -31,7 +31,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
-const TEMPLATES: Template[] = ["A", "B", "C", "D"];
+const TEMPLATES: Template[] = ["A", "B", "C", "D", "freeform"];
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((res, rej) => {
@@ -92,6 +92,7 @@ const GRID_COLS: Record<number, string> = {
   2: "grid-cols-2",
   3: "grid-cols-3",
   4: "grid-cols-4",
+  5: "grid-cols-5",
 };
 
 function SegmentedControl<T extends string>({
@@ -214,6 +215,7 @@ export function ControlPanel({
   }, [selectedTitleId]);
 
   const usesImage = comp.variant === "split" || comp.variant === "full";
+  const isFreeform = comp.template === "freeform";
   const lineCount =
     comp.template === "D" ? 0 : comp.titles[0]?.text.split("\n").length ?? 1;
 
@@ -273,6 +275,7 @@ export function ControlPanel({
     <aside className="flex w-80 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-background p-5">
       <h1 className="text-lg font-semibold">Composer</h1>
 
+      {!isFreeform && (
       <Section title="Format">
         <SegmentedControl
           options={FORMATS}
@@ -281,12 +284,14 @@ export function ControlPanel({
           columns={3}
         />
       </Section>
+      )}
 
       <Section title="Template">
         <SegmentedControl
           options={TEMPLATES}
           value={comp.template}
-          columns={4}
+          columns={5}
+          getLabel={(t) => (t === "freeform" ? "Free" : t)}
           onChange={(t) =>
             setComp((c) => {
               let titles = c.titles;
@@ -307,6 +312,8 @@ export function ControlPanel({
           }
         />
 
+        {!isFreeform && (
+        <>
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-xs">Variant</Label>
@@ -549,8 +556,11 @@ export function ControlPanel({
             />
           </div>
         )}
+        </>
+        )}
       </Section>
 
+      {!isFreeform && (
       <Section title="Colors">
         <div className="grid grid-cols-2 gap-3">
           <ColorField
@@ -577,6 +587,7 @@ export function ControlPanel({
           ))}
         </div>
       </Section>
+      )}
 
       <Section title="Titles">
         <div className="space-y-2">
@@ -704,6 +715,7 @@ export function ControlPanel({
         </div>
       </Section>
 
+      {!isFreeform && (
       <Section title="Text">
         <div className="space-y-2">
           {TEMPLATE_CAPTIONS[comp.template].map((slot) => {
@@ -764,17 +776,26 @@ export function ControlPanel({
           })}
         </div>
       </Section>
+      )}
 
       <Section title="Export">
-        <Button className="w-full" onClick={onExport} disabled={exporting}>
-          {exporting ? "Exporting…" : "Export JPG"}
-        </Button>
-        {(comp.variant === "multi" || comp.variant === "split") && comp.animate && (
-          <Button className="w-full" onClick={onExportMp4} disabled={exportingMp4}>
-            {exportingMp4
-              ? `Exporting MP4… ${Math.round((mp4Progress ?? 0) * 100)}%`
-              : "Export MP4"}
+        {isFreeform ? (
+          <Button className="w-full" onClick={() => console.log("svg export →")}>
+            Export SVG
           </Button>
+        ) : (
+          <>
+            <Button className="w-full" onClick={onExport} disabled={exporting}>
+              {exporting ? "Exporting…" : "Export JPG"}
+            </Button>
+            {(comp.variant === "multi" || comp.variant === "split") && comp.animate && (
+              <Button className="w-full" onClick={onExportMp4} disabled={exportingMp4}>
+                {exportingMp4
+                  ? `Exporting MP4… ${Math.round((mp4Progress ?? 0) * 100)}%`
+                  : "Export MP4"}
+              </Button>
+            )}
+          </>
         )}
         <Button
           variant="outline"

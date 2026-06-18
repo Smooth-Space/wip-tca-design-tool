@@ -5,6 +5,7 @@ import { computeMultiLayout } from "@/lib/multiLayout";
 import { TemplateA } from "@/components/TemplateA";
 import { TemplateBC } from "@/components/TemplateBC";
 import { TemplateD } from "@/components/TemplateD";
+import { FreeformCanvas } from "@/components/FreeformCanvas";
 import type { MultiSphereHandle } from "@/components/MultiSphere";
 
 const FORMAT_DIMENSIONS: Record<Composition["format"], { w: number; h: number }> = {
@@ -14,6 +15,44 @@ const FORMAT_DIMENSIONS: Record<Composition["format"], { w: number; h: number }>
 };
 
 export function Canvas({
+  comp,
+  compositionRef,
+  sphereRef,
+  selectedTitleId,
+  onSelectTitle,
+  hideSelection,
+}: {
+  comp: Composition;
+  compositionRef?: React.Ref<HTMLDivElement>;
+  sphereRef?: React.Ref<MultiSphereHandle>;
+  selectedTitleId?: string | null;
+  onSelectTitle?: (id: string | null) => void;
+  hideSelection?: boolean;
+}) {
+  if (comp.template === "freeform") {
+    return (
+      <FreeformCanvas
+        comp={comp}
+        compositionRef={compositionRef}
+        selectedTitleId={selectedTitleId}
+        onSelectTitle={onSelectTitle}
+        hideSelection={hideSelection}
+      />
+    );
+  }
+  return (
+    <FixedCanvas
+      comp={comp}
+      compositionRef={compositionRef}
+      sphereRef={sphereRef}
+      selectedTitleId={selectedTitleId}
+      onSelectTitle={onSelectTitle}
+      hideSelection={hideSelection}
+    />
+  );
+}
+
+function FixedCanvas({
   comp,
   compositionRef,
   sphereRef,
