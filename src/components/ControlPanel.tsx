@@ -782,7 +782,7 @@ export function ControlPanel({
 
       <Section title="Export">
         {isFreeform ? (
-          <Button className="w-full" onClick={() => console.log("svg export →")}>
+          <Button className="w-full" onClick={onExportSvg}>
             Export SVG
           </Button>
         ) : (
