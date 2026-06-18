@@ -171,24 +171,55 @@ function RerollButton({
   );
 }
 
+function FieldLabel({ label, descriptor }: { label: string; descriptor?: string }) {
+  return (
+    <div className="space-y-0.5">
+      <Label className="text-xs">{label}</Label>
+      {descriptor && <div className="text-xs text-muted-foreground">{descriptor}</div>}
+    </div>
+  );
+}
+
 function ColorField({
   label,
+  descriptor,
   value,
   onChange,
 }: {
   label: string;
+  descriptor?: string;
   value: string;
   onChange: (v: string) => void;
 }) {
+  const [text, setText] = useState(value);
+  useEffect(() => setText(value), [value]);
+  const commit = (v: string) => {
+    const s = v.startsWith("#") ? v : `#${v}`;
+    if (/^#[0-9a-fA-F]{6}$/.test(s)) onChange(s.toLowerCase());
+  };
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs">{label}</Label>
-      <input
-        type="color"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-full cursor-pointer rounded-md border border-input bg-background"
-      />
+      <FieldLabel label={label} descriptor={descriptor} />
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-12 shrink-0 cursor-pointer rounded-md border border-input bg-background"
+        />
+        <input
+          type="text"
+          value={text}
+          spellCheck={false}
+          onChange={(e) => {
+            setText(e.target.value);
+            commit(e.target.value);
+          }}
+          onBlur={() => setText(value)}
+          className="h-9 w-full rounded-md border border-input bg-background px-2 font-mono text-xs uppercase"
+          placeholder="#000000"
+        />
+      </div>
     </div>
   );
 }
