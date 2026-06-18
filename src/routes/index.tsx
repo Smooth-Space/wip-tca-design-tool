@@ -94,6 +94,10 @@ function Composer() {
             restored.titleShiftSeed = newSeed();
           }
           if (typeof restored.titleShift !== "boolean") restored.titleShift = false;
+          restored.titleAmplitude =
+            typeof restored.titleAmplitude === "number" ? restored.titleAmplitude : null;
+          restored.titlePhase =
+            typeof restored.titlePhase === "number" ? restored.titlePhase : null;
           if (restored.titleSizeMode !== "fixed" && restored.titleSizeMode !== "fit") {
             restored.titleSizeMode = "fixed";
           }
