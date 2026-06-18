@@ -300,7 +300,7 @@ export function ControlPanel({
         <SegmentedControl
           options={TEMPLATES}
           value={comp.template}
-          columns={5}
+          columns={4}
           getLabel={(t) => (t === "freeform" ? "Free" : t)}
           onChange={(t) =>
             setComp((c) => {
