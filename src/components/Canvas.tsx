@@ -29,11 +29,6 @@ export function Canvas({
   onSelectTitle?: (id: string | null) => void;
   hideSelection?: boolean;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
-  const { w, h } = FORMAT_DIMENSIONS[comp.format];
-  const imgSrc = comp.images[0]?.src ?? PLACEHOLDER_SRC;
-
   if (comp.template === "freeform") {
     return (
       <FreeformCanvas
@@ -45,6 +40,37 @@ export function Canvas({
       />
     );
   }
+  return (
+    <FixedCanvas
+      comp={comp}
+      compositionRef={compositionRef}
+      sphereRef={sphereRef}
+      selectedTitleId={selectedTitleId}
+      onSelectTitle={onSelectTitle}
+      hideSelection={hideSelection}
+    />
+  );
+}
+
+function FixedCanvas({
+  comp,
+  compositionRef,
+  sphereRef,
+  selectedTitleId,
+  onSelectTitle,
+  hideSelection,
+}: {
+  comp: Composition;
+  compositionRef?: React.Ref<HTMLDivElement>;
+  sphereRef?: React.Ref<MultiSphereHandle>;
+  selectedTitleId?: string | null;
+  onSelectTitle?: (id: string | null) => void;
+  hideSelection?: boolean;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const { w, h } = FORMAT_DIMENSIONS[comp.format];
+  const imgSrc = comp.images[0]?.src ?? PLACEHOLDER_SRC;
 
   const multiPlacements = useMemo(
     () =>
