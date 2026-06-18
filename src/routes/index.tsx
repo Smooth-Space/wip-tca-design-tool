@@ -5,6 +5,7 @@ import { toJpeg, toPng } from "html-to-image";
 import { ControlPanel } from "@/components/ControlPanel";
 import { Canvas } from "@/components/Canvas";
 import { exportLoopMp4 } from "@/lib/mp4Export";
+import { exportFreeformSVG } from "@/lib/freeformSvg";
 import type { MultiSphereHandle } from "@/components/MultiSphere";
 import { defaultComposition, type Composition, type Format } from "@/lib/composition";
 import { newSeed } from "@/lib/engine";
@@ -69,6 +70,7 @@ function Composer() {
   const [comp, setComp] = useState<Composition>(defaultComposition);
   const compositionRef = useRef<HTMLDivElement>(null);
   const sphereRef = useRef<MultiSphereHandle>(null);
+  const areaWidthRef = useRef(1080);
   const [exporting, setExporting] = useState(false);
   const [exportingMp4, setExportingMp4] = useState(false);
   const [mp4Progress, setMp4Progress] = useState(0);
