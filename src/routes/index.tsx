@@ -23,7 +23,7 @@ export const Route = createFileRoute("/")({
 });
 
 const STORAGE_KEY = "tca-composition";
-const VERSION = 6;
+const VERSION = 7;
 
 function nativeRectWithin(node: HTMLElement, ancestor: HTMLElement) {
   let x = 0,
@@ -94,6 +94,10 @@ function Composer() {
             restored.titleShiftSeed = newSeed();
           }
           if (typeof restored.titleShift !== "boolean") restored.titleShift = false;
+          restored.titleAmplitude =
+            typeof restored.titleAmplitude === "number" ? restored.titleAmplitude : null;
+          restored.titlePhase =
+            typeof restored.titlePhase === "number" ? restored.titlePhase : null;
           if (restored.titleSizeMode !== "fixed" && restored.titleSizeMode !== "fit") {
             restored.titleSizeMode = "fixed";
           }

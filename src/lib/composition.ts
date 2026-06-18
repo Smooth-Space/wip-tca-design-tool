@@ -76,6 +76,8 @@ export interface Composition {
   titleSizeMode: "fixed" | "fit";
   titleMode: Mode;
   titleSeed: number;
+  titleAmplitude: number | null;
+  titlePhase: number | null;
   titleShift: boolean;
   titleShiftSeed: number;
   images: ImageItem[];
@@ -102,6 +104,8 @@ export const defaultComposition: Composition = {
   titleSizeMode: "fixed",
   titleMode: "mixed",
   titleSeed: (Math.random() * 0xffffffff) >>> 0,
+  titleAmplitude: null,
+  titlePhase: null,
   titleShift: false,
   titleShiftSeed: newSeed(),
   images: [],
