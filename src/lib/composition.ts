@@ -59,24 +59,6 @@ export const TEMPLATE_CAPTIONS: Record<Template, CaptionSlot[]> = {
       label: "Text 4 (bottom-right)",
     },
   ],
-  C: [
-    { key: "text1", anchor: "top", column: "left", align: "left", label: "Text 1 (top-left)" },
-    { key: "text2", anchor: "top", column: "right", align: "left", label: "Text 2 (top-right)" },
-    {
-      key: "text3",
-      anchor: "bottom",
-      column: "left",
-      align: "left",
-      label: "Text 3 (bottom-left)",
-    },
-    {
-      key: "text4",
-      anchor: "bottom",
-      column: "right",
-      align: "left",
-      label: "Text 4 (bottom-right)",
-    },
-  ],
   D: [
     { key: "text1", anchor: "middle", column: "left", align: "left", label: "Text 1" },
     { key: "text2", anchor: "middle", column: "right", align: "right", label: "Text 2" },
@@ -87,7 +69,6 @@ export const TEMPLATE_CAPTIONS: Record<Template, CaptionSlot[]> = {
 export const TEMPLATE_VARIANTS: Record<Template, Variant[]> = {
   A: ["none", "split", "full", "multi"],
   B: ["none", "split", "full", "multi"],
-  C: ["none", "split", "full", "multi"],
   D: ["none", "split", "full", "multi"],
   freeform: ["none"],
 };
