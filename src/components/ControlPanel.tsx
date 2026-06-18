@@ -416,15 +416,6 @@ export function ControlPanel({
                   onChange={onUploadSplit}
                   className="hidden"
                 />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  disabled={comp.images.length >= 5}
-                  onClick={() => splitFileRef.current?.click()}
-                >
-                  <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
-                </Button>
                 {comp.images.length > 0 && (
                   <div className="space-y-2">
                     {comp.images.map((im, i) => (
@@ -451,6 +442,15 @@ export function ControlPanel({
                     ))}
                   </div>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  disabled={comp.images.length >= 5}
+                  onClick={() => splitFileRef.current?.click()}
+                >
+                  <Plus className="mr-1 h-4 w-4" /> Add images ({comp.images.length}/5)
+                </Button>
                 {comp.template === "A" && (
                   <SegmentedControl
                     options={["half", "span"] as SplitStyle[]}
