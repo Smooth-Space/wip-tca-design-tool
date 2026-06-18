@@ -560,6 +560,7 @@ export function ControlPanel({
         )}
       </Section>
 
+      {!isFreeform && (
       <Section title="Colors">
         <div className="grid grid-cols-2 gap-3">
           <ColorField
@@ -586,6 +587,7 @@ export function ControlPanel({
           ))}
         </div>
       </Section>
+      )}
 
       <Section title="Titles">
         <div className="space-y-2">
