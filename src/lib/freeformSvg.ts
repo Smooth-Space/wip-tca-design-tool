@@ -181,9 +181,6 @@ export async function exportFreeformSVG(comp: Composition, areaWidth: number) {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${vbW.toFixed(2)}" height="${vbH.toFixed(
       2,
     )}" viewBox="${vbX.toFixed(2)} ${vbY.toFixed(2)} ${vbW.toFixed(2)} ${vbH.toFixed(2)}">` +
-    `<rect x="${vbX.toFixed(2)}" y="${vbY.toFixed(2)}" width="${vbW.toFixed(2)}" height="${vbH.toFixed(
-      2,
-    )}" fill="#FFFFFF"/>` +
     paths +
     `</svg>`;
 
