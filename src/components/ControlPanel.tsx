@@ -597,14 +597,16 @@ export function ControlPanel({
             <Label className="text-xs">Mode</Label>
             <RerollButton
               disabled={comp.titleMode === "mixed"}
-              onClick={() => update({ titleSeed: newSeed() })}
+              onClick={() => update({ titleSeed: newSeed(), titleAmplitude: null, titlePhase: null })}
               tooltip={comp.titleMode === "mixed" ? "No randomness in Mixed mode" : "Reroll type"}
             />
           </div>
           <SegmentedControl
             options={MODES}
             value={comp.titleMode}
-            onChange={(m) => update({ titleMode: m, titleSeed: newSeed() })}
+            onChange={(m) =>
+              update({ titleMode: m, titleSeed: newSeed(), titleAmplitude: null, titlePhase: null })
+            }
             columns={3}
             capitalize
           />
