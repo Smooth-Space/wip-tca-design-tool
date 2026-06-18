@@ -275,6 +275,7 @@ export function ControlPanel({
     <aside className="flex w-80 shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-background p-5">
       <h1 className="text-lg font-semibold">Composer</h1>
 
+      {!isFreeform && (
       <Section title="Format">
         <SegmentedControl
           options={FORMATS}
@@ -283,12 +284,14 @@ export function ControlPanel({
           columns={3}
         />
       </Section>
+      )}
 
       <Section title="Template">
         <SegmentedControl
           options={TEMPLATES}
           value={comp.template}
-          columns={4}
+          columns={5}
+          getLabel={(t) => (t === "freeform" ? "Free" : t)}
           onChange={(t) =>
             setComp((c) => {
               let titles = c.titles;
