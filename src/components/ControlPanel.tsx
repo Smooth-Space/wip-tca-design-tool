@@ -215,6 +215,7 @@ export function ControlPanel({
   }, [selectedTitleId]);
 
   const usesImage = comp.variant === "split" || comp.variant === "full";
+  const isFreeform = comp.template === "freeform";
   const lineCount =
     comp.template === "D" ? 0 : comp.titles[0]?.text.split("\n").length ?? 1;
 
