@@ -120,3 +120,56 @@ export const defaultComposition: Composition = {
   captionColors: { text1: "#000000", text2: "#000000", text3: "#000000", text4: "#000000" },
   captionHidden: { text1: false, text2: false, text3: false, text4: false },
 };
+
+export function normalizeComposition(data: Partial<Composition> | undefined): Composition {
+  const c = { ...defaultComposition, ...(data ?? {}) } as Composition;
+
+  // seeds — must be finite numbers
+  if (typeof c.titleSeed !== "number" || !Number.isFinite(c.titleSeed)) c.titleSeed = newSeed();
+  if (typeof c.titleShiftSeed !== "number" || !Number.isFinite(c.titleShiftSeed))
+    c.titleShiftSeed = newSeed();
+  if (typeof c.animSeed !== "number" || !Number.isFinite(c.animSeed)) c.animSeed = newSeed();
+  if (typeof c.multiSeed !== "number" || !Number.isFinite(c.multiSeed)) c.multiSeed = newSeed();
+
+  // booleans
+  if (typeof c.titleShift !== "boolean") c.titleShift = false;
+  if (typeof c.animate !== "boolean") c.animate = false;
+  if (typeof c.animPlaying !== "boolean") c.animPlaying = true;
+
+  // optional waveform overrides: number | null
+  c.titleAmplitude = typeof c.titleAmplitude === "number" ? c.titleAmplitude : null;
+  c.titlePhase = typeof c.titlePhase === "number" ? c.titlePhase : null;
+
+  // enums / clamped numbers
+  if (c.titleSizeMode !== "fixed" && c.titleSizeMode !== "fit") c.titleSizeMode = "fixed";
+  c.globeScale =
+    typeof c.globeScale === "number" && Number.isFinite(c.globeScale)
+      ? Math.min(2, Math.max(1, c.globeScale))
+      : 1;
+
+  // titles: always a non-empty array; A/B/C/freeform use a single (possibly multi-line) field; D needs exactly 2
+  if (!Array.isArray(c.titles) || c.titles.length === 0) {
+    c.titles = [{ id: "t1", text: "" }];
+  }
+  if (c.template !== "D" && c.titles.length > 1) {
+    c.titles = [{ id: c.titles[0].id, text: c.titles.map((t) => t.text).join("\n") }];
+  }
+  if (c.template === "D") {
+    c.titles = [...c.titles];
+    while (c.titles.length < 2) c.titles.push({ id: crypto.randomUUID(), text: "" });
+    if (c.titles.length > 2) c.titles.length = 2;
+  }
+
+  // caption visibility flags
+  c.captionHidden = {
+    text1: c.captionHidden?.text1 === true,
+    text2: c.captionHidden?.text2 === true,
+    text3: c.captionHidden?.text3 === true,
+    text4: c.captionHidden?.text4 === true,
+  };
+
+  // drop a legacy field that may exist in older saves
+  delete (c as unknown as Record<string, unknown>).titleShiftOffsets;
+
+  return c;
+}
