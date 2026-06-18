@@ -5,7 +5,7 @@ export type Format = "1:1" | "4:5" | "9:16";
 export type Mode = "light" | "mixed" | "heavy";
 export type Variant = "none" | "split" | "full" | "multi";
 export type SplitOrder = "image-first" | "title-first";
-export type Template = "A" | "B" | "C" | "D";
+export type Template = "A" | "B" | "C" | "D" | "freeform";
 
 export type CaptionKey = "text1" | "text2" | "text3" | "text4";
 
@@ -40,6 +40,7 @@ export const TEMPLATE_CAPTIONS: Record<Template, CaptionSlot[]> = {
     { key: "text1", anchor: "middle", column: "left", align: "left", label: "Text 1" },
     { key: "text2", anchor: "middle", column: "right", align: "right", label: "Text 2" },
   ],
+  freeform: [],
 };
 
 export const TEMPLATE_VARIANTS: Record<Template, Variant[]> = {
@@ -47,6 +48,7 @@ export const TEMPLATE_VARIANTS: Record<Template, Variant[]> = {
   B: ["none", "split", "full", "multi"],
   C: ["none", "split", "full", "multi"],
   D: ["none", "split", "full", "multi"],
+  freeform: ["none"],
 };
 
 export const PLACEHOLDER_SRC = lagunaGloriaAsset.url;
