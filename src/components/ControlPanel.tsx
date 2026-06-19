@@ -37,7 +37,7 @@ interface Props {
 
 const FORMATS: Format[] = ["1:1", "4:5", "9:16"];
 const MODES: Mode[] = ["light", "mixed", "heavy"];
-const TEMPLATES: Template[] = ["A", "B", "D", "freeform"];
+const TEMPLATES: Template[] = ["freeform", "A", "B", "D"];
 
 function fileToDataUrl(file: File): Promise<string> {
   return new Promise((res, rej) => {
@@ -332,7 +332,9 @@ export function ControlPanel({
           options={TEMPLATES}
           value={comp.template}
           columns={4}
-          getLabel={(t) => (t === "freeform" ? "Free" : t)}
+          getLabel={(t) =>
+            t === "freeform" ? "Free" : t === "A" ? "1" : t === "B" ? "2" : t === "D" ? "3" : t
+          }
           onChange={(t) =>
             setComp((c) => {
               let titles = c.titles;
@@ -744,7 +746,6 @@ export function ControlPanel({
         <Section title="Text">
           <div className="space-y-2">
             {TEMPLATE_CAPTIONS[comp.template].map((slot) => {
-              const isEmpty = (comp.captions[slot.key] ?? "") === "";
               const hidden = comp.captionHidden[slot.key];
               return (
                 <div key={slot.key} className="space-y-1">
@@ -758,7 +759,6 @@ export function ControlPanel({
                               variant="ghost"
                               size="icon"
                               className="h-7 w-7"
-                              disabled={!isEmpty}
                               onClick={() =>
                                 update({
                                   captionHidden: { ...comp.captionHidden, [slot.key]: !hidden },
@@ -773,13 +773,7 @@ export function ControlPanel({
                             </Button>
                           </span>
                         </TooltipTrigger>
-                        <TooltipContent>
-                          {!isEmpty
-                            ? "Clear the text to hide this field"
-                            : hidden
-                              ? "Show field"
-                              : "Hide field"}
-                        </TooltipContent>
+                        <TooltipContent>{hidden ? "Show field" : "Hide field"}</TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
                   </div>

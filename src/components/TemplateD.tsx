@@ -22,10 +22,13 @@ function PinnedTitle({
   const { handleClick, handleDoubleClick, hideSelection, selectableStyle } = useSelectable(
     comp.titles[pin]?.id ?? null,
   );
+  const isEmpty = (comp.titles[pin]?.text ?? "").trim() === "";
   return (
     <div onClick={handleClick} onDoubleClick={handleDoubleClick} style={selectableStyle}>
-      {comp.titles[pin]?.text === "" && !hideSelection && (
-        <span style={{ opacity: 0.3, color: comp.titleColor }}>Title</span>
+      {isEmpty && !hideSelection && (
+        <span style={{ opacity: 0.3, color: comp.titleColor }}>
+          {pin === 0 ? "Title 1" : "Title 2"}
+        </span>
       )}
       {dLines
         .filter((l) => l.pin === pin)
