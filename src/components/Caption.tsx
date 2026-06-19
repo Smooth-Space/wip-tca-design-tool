@@ -21,7 +21,7 @@ export function Caption({
   const { hideSelection, handleClick, handleDoubleClick, selectableStyle } = useSelectable(
     captionKey ?? null,
   );
-  if (hidden && text === "") return null;
+  if (hidden) return null;
   const isEmpty = text === "";
   return (
     <div
