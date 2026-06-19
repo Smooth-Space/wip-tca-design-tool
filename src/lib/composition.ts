@@ -109,6 +109,7 @@ export const defaultComposition: Composition = {
   titlePhase: null,
   titleShift: false,
   titleShiftSeed: newSeed(),
+  titleShiftAmount: 1,
   images: [],
   splitOrder: "image-first",
   splitStyle: "half",
@@ -137,6 +138,10 @@ export function normalizeComposition(data: Partial<Composition> | undefined): Co
   if (typeof c.titleSeed !== "number" || !Number.isFinite(c.titleSeed)) c.titleSeed = newSeed();
   if (typeof c.titleShiftSeed !== "number" || !Number.isFinite(c.titleShiftSeed))
     c.titleShiftSeed = newSeed();
+  c.titleShiftAmount =
+    typeof c.titleShiftAmount === "number" && Number.isFinite(c.titleShiftAmount)
+      ? Math.min(1, Math.max(0, c.titleShiftAmount))
+      : 1;
   if (typeof c.animSeed !== "number" || !Number.isFinite(c.animSeed)) c.animSeed = newSeed();
   if (typeof c.multiSeed !== "number" || !Number.isFinite(c.multiSeed)) c.multiSeed = newSeed();
 
