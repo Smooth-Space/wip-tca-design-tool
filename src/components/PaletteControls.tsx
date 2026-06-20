@@ -204,20 +204,9 @@ export function PaletteControls({
       ) : (
         <>
           <HuePicker label="Type hue" value={p.hueA} onChange={(v) => reland({ hueA: v })} />
-          <HuePicker label="Field hue" value={p.hueB} onChange={(v) => reland({ hueB: v })} />
+          <HuePicker label="Background hue" value={p.hueB} onChange={(v) => reland({ hueB: v })} />
         </>
       )}
-
-      {/* Graphic mode */}
-      <label className="flex items-center gap-2 text-xs">
-        <input
-          type="checkbox"
-          checked={p.graphic}
-          onChange={(e) => apply({ ...p, graphic: e.target.checked })}
-          className="h-4 w-4 rounded border-input"
-        />
-        <span>Graphic mode — allow low-contrast (felt, not read)</span>
-      </label>
 
       {/* Background strip */}
       <div className="space-y-1.5">
@@ -226,7 +215,6 @@ export function PaletteControls({
           palette={p}
           hue={fieldHue}
           current={p.bgStep}
-          marker="B"
           onPick={(step) => reland({ bgStep: step })}
         />
       </div>
@@ -239,7 +227,6 @@ export function PaletteControls({
           hue={typeHue}
           current={p.titleStep}
           threshold={TITLE_THRESHOLD}
-          marker="T"
           onPick={(step) => apply({ ...p, titleStep: step })}
         />
       </div>
@@ -252,7 +239,6 @@ export function PaletteControls({
           hue={typeHue}
           current={p.textStep}
           threshold={TEXT_THRESHOLD}
-          marker="t"
           onPick={(step) => apply({ ...p, textStep: step })}
         />
       </div>
@@ -261,24 +247,6 @@ export function PaletteControls({
       <div className="space-y-1 rounded-md border border-border bg-muted/50 p-2">
         <ContrastReadout label="Title on background" ratio={titleRatio} />
         <ContrastReadout label="Text on background" ratio={textRatio} />
-      </div>
-
-      {/* Resolved field summary */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: "Background", color: resolved.background, scale: fieldHue, step: p.bgStep },
-          { label: "Title", color: resolved.titleColor, scale: typeHue, step: p.titleStep },
-          { label: "Text", color: resolved.textColor, scale: typeHue, step: p.textStep },
-        ].map((f) => (
-          <div key={f.label} className="space-y-1 text-[10px]">
-            <div className="h-8 rounded-md border border-border" style={{ background: f.color }} />
-            <div className="font-medium">{f.label}</div>
-            <div className="font-mono uppercase text-muted-foreground">{f.color}</div>
-            <div className="text-muted-foreground">
-              {HUE_LABEL[f.scale]} · {String(f.step).padStart(2, "0")}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
