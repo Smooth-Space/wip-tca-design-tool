@@ -219,5 +219,17 @@ export function normalizeComposition(data: Partial<Composition> | undefined): Co
   // drop a legacy field that may exist in older saves
   delete (c as unknown as Record<string, unknown>).titleShiftOffsets;
 
+  // palette state
+  const p = (c.palette ?? {}) as Partial<PaletteState>;
+  c.palette = {
+    formula: p.formula === "mixed" ? "mixed" : "mono",
+    hueA: isTcaScale(p.hueA) ? p.hueA : "gray",
+    hueB: isTcaScale(p.hueB) ? p.hueB : "gray",
+    bgStep: clampStep(p.bgStep ?? 1),
+    titleStep: clampStep(p.titleStep ?? 12),
+    textStep: clampStep(p.textStep ?? 12),
+    graphic: p.graphic === true,
+  };
+
   return c;
 }
