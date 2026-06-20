@@ -74,14 +74,12 @@ function StepStrip({
   hue,
   current,
   threshold,
-  marker,
   onPick,
 }: {
   palette: PaletteState;
   hue: TcaScale;
   current: number;
   threshold?: number;
-  marker?: string;
   onPick: (step: number) => void;
 }) {
   return (
@@ -105,22 +103,20 @@ function StepStrip({
                   ? "border-border hover:border-foreground/40"
                   : "border-border cursor-not-allowed",
             )}
-            style={{
-              background: tcaColor(hue, step),
-              ...(!selectable
-                ? {
-                    backgroundImage:
-                      "repeating-linear-gradient(45deg, rgba(0,0,0,0.28) 0 2px, transparent 2px 5px)",
-                  }
-                : {}),
-            }}
+            style={{ background: tcaColor(hue, step) }}
           >
-            {selected && marker && (
-              <span
-                className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
-                style={{ color: tcaColor(hue, step <= 6 ? 12 : 1) }}
-              >
-                {marker}
+            {!selectable && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-full"
+                  style={{ background: "rgba(0,0,0,0.12)" }}
+                >
+                  <X
+                    className="h-3 w-3"
+                    strokeWidth={2.5}
+                    style={{ color: step <= 9 ? "#23201B" : "#FDFBF7" }}
+                  />
+                </span>
               </span>
             )}
           </button>
@@ -137,7 +133,15 @@ function ContrastReadout({ label, ratio }: { label: string; ratio: number }) {
       <span className="text-muted-foreground">{label}</span>
       <span className="flex items-center gap-1.5 font-mono">
         {ratio.toFixed(2)}:1
-        <span className={cn("rounded px-1 py-0.5 text-[10px] font-semibold", pass ? "bg-secondary text-secondary-foreground" : "bg-destructive text-destructive-foreground")}>
+        <span
+          className={cn(
+            "flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold",
+            pass
+              ? "bg-success/15 text-success"
+              : "bg-muted text-muted-foreground",
+          )}
+        >
+          {pass ? <Check className="h-3 w-3" strokeWidth={3} /> : <X className="h-3 w-3" strokeWidth={3} />}
           {pass ? "AA-large" : "fail"}
         </span>
       </span>
