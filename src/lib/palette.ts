@@ -49,7 +49,6 @@ export function isStepSelectable(
   step: number,
   threshold: number,
 ): boolean {
-  if (p.graphic) return true;
   const bg = tcaColor(fieldHueOf(p), p.bgStep);
   const fg = tcaColor(typeHueOf(p), step);
   return contrastRatio(bg, fg) >= threshold;
