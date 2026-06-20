@@ -5,7 +5,6 @@ import {
   bestPassingStep,
   fieldHueOf,
   isStepSelectable,
-  resolvePalette,
   stepContrast,
   typeHueOf,
   TITLE_THRESHOLD,
@@ -13,6 +12,7 @@ import {
 } from "@/lib/palette";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { X, Check } from "lucide-react";
 
 const HUE_LABEL: Record<TcaScale, string> = {
   gray: "Gray",
@@ -22,6 +22,17 @@ const HUE_LABEL: Record<TcaScale, string> = {
   teal: "Teal",
   blue: "Blue",
   purple: "Purple",
+};
+
+// Representative step for each hue's round picker chip.
+const HUE_CHIP_STEP: Record<TcaScale, number> = {
+  gray: 12,
+  red: 9,
+  gold: 9,
+  green: 9,
+  teal: 9,
+  blue: 9,
+  purple: 9,
 };
 
 function HuePicker({
@@ -49,7 +60,7 @@ function HuePicker({
                 ? "border-ring ring-2 ring-ring ring-offset-1 ring-offset-background"
                 : "border-border",
             )}
-            style={{ background: tcaColor(s, 9) }}
+            style={{ background: tcaColor(s, HUE_CHIP_STEP[s]) }}
           />
         ))}
       </div>
@@ -62,14 +73,12 @@ function StepStrip({
   hue,
   current,
   threshold,
-  marker,
   onPick,
 }: {
   palette: PaletteState;
   hue: TcaScale;
   current: number;
   threshold?: number;
-  marker?: string;
   onPick: (step: number) => void;
 }) {
   return (
@@ -93,22 +102,20 @@ function StepStrip({
                   ? "border-border hover:border-foreground/40"
                   : "border-border cursor-not-allowed",
             )}
-            style={{
-              background: tcaColor(hue, step),
-              ...(!selectable
-                ? {
-                    backgroundImage:
-                      "repeating-linear-gradient(45deg, rgba(0,0,0,0.28) 0 2px, transparent 2px 5px)",
-                  }
-                : {}),
-            }}
+            style={{ background: tcaColor(hue, step) }}
           >
-            {selected && marker && (
-              <span
-                className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
-                style={{ color: tcaColor(hue, step <= 6 ? 12 : 1) }}
-              >
-                {marker}
+            {!selectable && (
+              <span className="absolute inset-0 flex items-center justify-center">
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-full"
+                  style={{ background: "rgba(0,0,0,0.12)" }}
+                >
+                  <X
+                    className="h-3 w-3"
+                    strokeWidth={2.5}
+                    style={{ color: step <= 9 ? "#23201B" : "#FDFBF7" }}
+                  />
+                </span>
               </span>
             )}
           </button>
@@ -125,7 +132,15 @@ function ContrastReadout({ label, ratio }: { label: string; ratio: number }) {
       <span className="text-muted-foreground">{label}</span>
       <span className="flex items-center gap-1.5 font-mono">
         {ratio.toFixed(2)}:1
-        <span className={cn("rounded px-1 py-0.5 text-[10px] font-semibold", pass ? "bg-secondary text-secondary-foreground" : "bg-destructive text-destructive-foreground")}>
+        <span
+          className={cn(
+            "flex items-center gap-0.5 rounded px-1 py-0.5 text-[10px] font-semibold",
+            pass
+              ? "bg-success/15 text-success"
+              : "bg-muted text-muted-foreground",
+          )}
+        >
+          {pass ? <Check className="h-3 w-3" strokeWidth={3} /> : <X className="h-3 w-3" strokeWidth={3} />}
           {pass ? "AA-large" : "fail"}
         </span>
       </span>
@@ -154,7 +169,6 @@ export function PaletteControls({
 
   const fieldHue = fieldHueOf(p);
   const typeHue = typeHueOf(p);
-  const resolved = resolvePalette(p);
   const titleRatio = stepContrast(p, p.titleStep);
   const textRatio = stepContrast(p, p.textStep);
 
@@ -188,20 +202,9 @@ export function PaletteControls({
       ) : (
         <>
           <HuePicker label="Type hue" value={p.hueA} onChange={(v) => reland({ hueA: v })} />
-          <HuePicker label="Field hue" value={p.hueB} onChange={(v) => reland({ hueB: v })} />
+          <HuePicker label="Background hue" value={p.hueB} onChange={(v) => reland({ hueB: v })} />
         </>
       )}
-
-      {/* Graphic mode */}
-      <label className="flex items-center gap-2 text-xs">
-        <input
-          type="checkbox"
-          checked={p.graphic}
-          onChange={(e) => apply({ ...p, graphic: e.target.checked })}
-          className="h-4 w-4 rounded border-input"
-        />
-        <span>Graphic mode — allow low-contrast (felt, not read)</span>
-      </label>
 
       {/* Background strip */}
       <div className="space-y-1.5">
@@ -210,7 +213,6 @@ export function PaletteControls({
           palette={p}
           hue={fieldHue}
           current={p.bgStep}
-          marker="B"
           onPick={(step) => reland({ bgStep: step })}
         />
       </div>
@@ -223,7 +225,6 @@ export function PaletteControls({
           hue={typeHue}
           current={p.titleStep}
           threshold={TITLE_THRESHOLD}
-          marker="T"
           onPick={(step) => apply({ ...p, titleStep: step })}
         />
       </div>
@@ -236,7 +237,6 @@ export function PaletteControls({
           hue={typeHue}
           current={p.textStep}
           threshold={TEXT_THRESHOLD}
-          marker="t"
           onPick={(step) => apply({ ...p, textStep: step })}
         />
       </div>
@@ -245,24 +245,6 @@ export function PaletteControls({
       <div className="space-y-1 rounded-md border border-border bg-muted/50 p-2">
         <ContrastReadout label="Title on background" ratio={titleRatio} />
         <ContrastReadout label="Text on background" ratio={textRatio} />
-      </div>
-
-      {/* Resolved field summary */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: "Background", color: resolved.background, scale: fieldHue, step: p.bgStep },
-          { label: "Title", color: resolved.titleColor, scale: typeHue, step: p.titleStep },
-          { label: "Text", color: resolved.textColor, scale: typeHue, step: p.textStep },
-        ].map((f) => (
-          <div key={f.label} className="space-y-1 text-[10px]">
-            <div className="h-8 rounded-md border border-border" style={{ background: f.color }} />
-            <div className="font-medium">{f.label}</div>
-            <div className="font-mono uppercase text-muted-foreground">{f.color}</div>
-            <div className="text-muted-foreground">
-              {HUE_LABEL[f.scale]} · {String(f.step).padStart(2, "0")}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
