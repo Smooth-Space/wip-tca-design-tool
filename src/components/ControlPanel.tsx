@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { newSeed, resolveWave } from "@/lib/engine";
 import { cn } from "@/lib/utils";
+import { PaletteControls } from "@/components/PaletteControls";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface Props {
