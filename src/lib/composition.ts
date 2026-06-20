@@ -1,4 +1,5 @@
 import { newSeed } from "@/lib/engine";
+import { type TcaScale, isTcaScale, clampStep } from "@/lib/tcaColors";
 
 export type Format = "1:1" | "4:5" | "9:16" | "3:2";
 export type Mode = "light" | "mixed" | "heavy";
@@ -62,6 +63,27 @@ export function isCaptionRowActive(
 
 export const PLACEHOLDER_COLOR = "#f9f9f9";
 
+export type PaletteFormula = "mono" | "mixed";
+export interface PaletteState {
+  formula: PaletteFormula;
+  hueA: TcaScale; // type hue (title/text); also the single hue in mono
+  hueB: TcaScale; // field hue (background) — used only in "mixed"
+  bgStep: number; // 1..12
+  titleStep: number; // 1..12 on hueA
+  textStep: number; // 1..12 on hueA
+  graphic: boolean; // allow sub-threshold (felt-not-read) steps
+}
+
+export const defaultPalette: PaletteState = {
+  formula: "mono",
+  hueA: "gray",
+  hueB: "gray",
+  bgStep: 1,
+  titleStep: 12,
+  textStep: 12,
+  graphic: false,
+};
+
 export interface Title {
   id: string;
   text: string;
@@ -102,6 +124,7 @@ export interface Composition {
   captions: Captions;
   captionColors: CaptionColors;
   captionHidden: CaptionFlags;
+  palette: PaletteState;
 }
 
 export const defaultComposition: Composition = {
@@ -132,6 +155,7 @@ export const defaultComposition: Composition = {
   captions: { text1: "Text 1", text2: "Text 2", text3: "Text 3", text4: "Text 4" },
   captionColors: { text1: "#000000", text2: "#000000", text3: "#000000", text4: "#000000" },
   captionHidden: { text1: false, text2: false, text3: false, text4: false },
+  palette: { ...defaultPalette },
 };
 
 export function normalizeComposition(data: Partial<Composition> | undefined): Composition {
@@ -194,6 +218,18 @@ export function normalizeComposition(data: Partial<Composition> | undefined): Co
 
   // drop a legacy field that may exist in older saves
   delete (c as unknown as Record<string, unknown>).titleShiftOffsets;
+
+  // palette state
+  const p = (c.palette ?? {}) as Partial<PaletteState>;
+  c.palette = {
+    formula: p.formula === "mixed" ? "mixed" : "mono",
+    hueA: isTcaScale(p.hueA) ? p.hueA : "gray",
+    hueB: isTcaScale(p.hueB) ? p.hueB : "gray",
+    bgStep: clampStep(p.bgStep ?? 1),
+    titleStep: clampStep(p.titleStep ?? 12),
+    textStep: clampStep(p.textStep ?? 12),
+    graphic: p.graphic === true,
+  };
 
   return c;
 }

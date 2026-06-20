@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { newSeed, resolveWave } from "@/lib/engine";
 import { cn } from "@/lib/utils";
+import { PaletteControls } from "@/components/PaletteControls";
 import { forwardRef, useEffect, useRef, useState } from "react";
 
 interface Props {
@@ -854,7 +855,8 @@ export function ControlPanel({
 
       {!isFreeform && (
         <Section title="Colors">
-          <div className="space-y-3">
+          <PaletteControls comp={comp} update={update} />
+          <div className="space-y-3 border-t border-border pt-4">
             <ColorField
               label="Background"
               value={comp.background}
