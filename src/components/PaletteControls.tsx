@@ -13,6 +13,7 @@ import {
 } from "@/lib/palette";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { X, Check } from "lucide-react";
 
 const HUE_LABEL: Record<TcaScale, string> = {
   gray: "Gray",
@@ -22,6 +23,17 @@ const HUE_LABEL: Record<TcaScale, string> = {
   teal: "Teal",
   blue: "Blue",
   purple: "Purple",
+};
+
+// Representative step for each hue's round picker chip.
+const HUE_CHIP_STEP: Record<TcaScale, number> = {
+  gray: 12,
+  red: 9,
+  gold: 9,
+  green: 9,
+  teal: 9,
+  blue: 9,
+  purple: 9,
 };
 
 function HuePicker({
@@ -49,7 +61,7 @@ function HuePicker({
                 ? "border-ring ring-2 ring-ring ring-offset-1 ring-offset-background"
                 : "border-border",
             )}
-            style={{ background: tcaColor(s, 9) }}
+            style={{ background: tcaColor(s, HUE_CHIP_STEP[s]) }}
           />
         ))}
       </div>
