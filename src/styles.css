@@ -89,6 +89,8 @@
   --accent-foreground: #23201B;
   --destructive: #D0440B;          /* red 10 */
   --destructive-foreground: #FDFBF7;
+  --success: #827500;              /* green 10 */
+  --success-foreground: #FDFBF7;   /* gray 01 */
   --border: #DBD6CD;               /* gray 06 — subtle border */
   --input: #DBD6CD;                /* gray 06 */
   --ring: #CFC9C0;                 /* gray 07 — focus ring */
