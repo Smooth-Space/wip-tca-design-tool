@@ -71,7 +71,6 @@ export interface PaletteState {
   bgStep: number; // 1..12
   titleStep: number; // 1..12 on hueA
   textStep: number; // 1..12 on hueA
-  graphic: boolean; // allow sub-threshold (felt-not-read) steps
 }
 
 export const defaultPalette: PaletteState = {
@@ -81,7 +80,6 @@ export const defaultPalette: PaletteState = {
   bgStep: 1,
   titleStep: 12,
   textStep: 12,
-  graphic: false,
 };
 
 export interface Title {
@@ -228,7 +226,6 @@ export function normalizeComposition(data: Partial<Composition> | undefined): Co
     bgStep: clampStep(p.bgStep ?? 1),
     titleStep: clampStep(p.titleStep ?? 12),
     textStep: clampStep(p.textStep ?? 12),
-    graphic: p.graphic === true,
   };
 
   return c;
