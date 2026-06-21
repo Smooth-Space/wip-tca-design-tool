@@ -10,6 +10,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# Use bun.lock as the canonical lockfile
+package-lock.json
 .output
 .vinxi
 .tanstack/**
