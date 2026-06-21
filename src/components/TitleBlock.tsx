@@ -62,6 +62,7 @@ export function TitleBlock({
         amplitude: titleAmplitude,
         phase: effectivePhase,
         forceDistribution: isAnimating && titleMode === "mixed" ? "sine" : undefined,
+        forceAmplitude: isAnimating && titleMode !== "mixed" ? 1 : undefined,
       }),
     [t0, titleMode, titleSeed, titleAmplitude, effectivePhase, isAnimating],
   );

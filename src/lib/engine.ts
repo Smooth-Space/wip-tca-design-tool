@@ -68,10 +68,12 @@ function distAt(
   amplitude: number,
   phase: number,
   forceDistribution?: "sine" | "linear",
+  forceAmplitude?: number,
 ) {
   const dist = forceDistribution ?? cfg.distribution;
+  const amp = forceAmplitude ?? amplitude;
   if (dist === "linear") return t;
-  return (Math.sin(2 * Math.PI * (amplitude * t + phase)) + 1) / 2; // sine, 0..1
+  return (Math.sin(2 * Math.PI * (amp * t + phase)) + 1) / 2; // sine, 0..1
 }
 
 function axisValue(spec: AxisSpec, d: number) {
@@ -97,6 +99,7 @@ export function computeAxes(
     amplitude?: number | null;
     phase?: number | null;
     forceDistribution?: "sine" | "linear";
+    forceAmplitude?: number;
   },
 ): Axes[] {
   const cfg = MODES[mode];
@@ -106,7 +109,7 @@ export function computeAxes(
   const N = chars.length;
   return chars.map((_, i) => {
     const t = N > 1 ? i / (N - 1) : 0;
-    const d = distAt(cfg, t, amplitude, phase, override?.forceDistribution);
+    const d = distAt(cfg, t, amplitude, phase, override?.forceDistribution, override?.forceAmplitude);
     return {
       wght: Math.round(axisValue(cfg.wght, d)),
       SRFF: Math.round(axisValue(cfg.SRFF, d)),
