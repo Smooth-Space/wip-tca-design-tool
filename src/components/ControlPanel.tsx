@@ -805,11 +805,10 @@ export function ControlPanel({
           <div className="flex items-center justify-between">
             <Label className="text-xs">Mode</Label>
             <RerollButton
-              disabled={comp.titleMode === "mixed"}
               onClick={() =>
                 update({ titleSeed: newSeed(), titleAmplitude: null, titlePhase: null })
               }
-              tooltip={comp.titleMode === "mixed" ? "No randomness in Mixed mode" : "Reroll type"}
+              tooltip="Reroll type"
             />
           </div>
           <SegmentedControl
@@ -1126,7 +1125,13 @@ function DistributionViz({
   const linear = mode === "mixed";
   const pts = Array.from({ length: N + 1 }, (_, i) => {
     const t = i / N;
-    const d = linear ? t : (Math.sin(2 * Math.PI * (amplitude * t + phase)) + 1) / 2;
+    let d: number;
+    if (linear) {
+      const s = (phase + t * 0.5) % 1;
+      d = s < 0.5 ? s * 2 : (1 - s) * 2;
+    } else {
+      d = (Math.sin(2 * Math.PI * (amplitude * t + phase)) + 1) / 2;
+    }
     const x = pad + t * (W - 2 * pad);
     const y = H - pad - d * (H - 2 * pad);
     return `${x.toFixed(1)},${y.toFixed(1)}`;
@@ -1212,14 +1217,11 @@ function AdvancedWave({
                     max={1}
                     step={0.01}
                     value={[ph]}
-                    disabled={isLinear}
                     onValueChange={([v]) => update({ titlePhase: v })}
                   />
                 </span>
               </TooltipTrigger>
-              {isLinear && (
-                <TooltipContent>Phase applies to Light/Heavy (Mixed is linear)</TooltipContent>
-              )}
+              <TooltipContent>Shifts where the ramp begins</TooltipContent>
             </Tooltip>
           </div>
         </TooltipProvider>

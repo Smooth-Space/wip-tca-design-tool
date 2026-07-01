@@ -277,9 +277,9 @@ export function TitleBlock({
         if (shiftEnabled) {
           return (
             <div key={lines[r].key} style={{ display: "flex", width: "100%" }}>
-              <div style={{ flex: `${offsets[r]} 0 0px` }} />
+              <div style={{ flex: `${offsets[r]} 0 0px`, transition: "flex 400ms ease" }} />
               {lineInner}
-              <div style={{ flex: `${1 - offsets[r]} 0 0px` }} />
+              <div style={{ flex: `${1 - offsets[r]} 0 0px`, transition: "flex 400ms ease" }} />
             </div>
           );
         }

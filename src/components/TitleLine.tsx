@@ -117,7 +117,12 @@ export function TitleSpans({
         return (
           <span
             key={i}
-            style={{ display: "inline", fontVariationSettings: a ? axesToCss(a) : undefined }}
+            style={{
+              display: "inline",
+              fontVariationSettings: a ? axesToCss(a) : undefined,
+              // Ease reroll (new seed → new axes on the same persistent spans).
+              transition: "font-variation-settings 400ms ease",
+            }}
           >
             {ch}
           </span>

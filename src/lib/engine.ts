@@ -32,8 +32,8 @@ export const MODES: Record<Mode, ModeConfig> = {
     wght: { kind: "lerp", start: 250, end: 625 },
     SRFF: { kind: "lerp", start: 65, end: 0 },
     distribution: "linear",
-    amplitude: 1,
-    phase: 0,
+    amplitude: 1, // unchanged — fixed, never randomized, never exposed for Mixed
+    phase: "random", // was 0 — now resolves a random phase like Light/Heavy do
   },
   heavy: {
     wdth: 85,
@@ -78,7 +78,15 @@ function distAt(
 ) {
   const dist = forceDistribution ?? cfg.distribution;
   const amp = forceAmplitude ?? amplitude;
-  if (dist === "linear") return t;
+  // Linear distribution sweeps HALF a cycle of a triangle wave, offset by phase.
+  // Half a triangle cycle from any point is always that point's complement, so the
+  // last character always lands at the opposite extreme from the first — for every
+  // phase. Being a triangle (not a sawtooth) there's no discontinuous jump anywhere,
+  // including across the modulo wrap. Amplitude is unused here.
+  if (dist === "linear") {
+    const s = (phase + t * 0.5) % 1;
+    return s < 0.5 ? s * 2 : (1 - s) * 2;
+  }
   return (Math.sin(2 * Math.PI * (amp * t + phase)) + 1) / 2; // sine, 0..1
 }
 
