@@ -75,10 +75,13 @@ export function TemplateD({
   imgSrc: string;
   sphereRef?: React.Ref<MultiSphereHandle>;
 }) {
-  const dTitles = useMemo(
-    () => [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""],
-    [comp.titles],
-  );
+  // Mixed mode renders uppercase — display-only (stored text is never mutated),
+  // applied per-title before splitting/flattening so axis indices stay aligned.
+  const dTitles = useMemo(() => {
+    const up = comp.titleMode === "mixed";
+    const raw = [comp.titles[0]?.text ?? "", comp.titles[1]?.text ?? ""];
+    return up ? raw.map((t) => t.toUpperCase()) : raw;
+  }, [comp.titles, comp.titleMode]);
   const dAxes = useMemo(
     () =>
       computeAxes(

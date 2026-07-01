@@ -120,7 +120,6 @@ function FixedCanvas({
       titleAmplitude={comp.titleAmplitude}
       titlePhase={comp.titlePhase}
       titleAnimate={comp.titleAnimate}
-      titleAnimPlaying={comp.titleAnimPlaying}
       titleBasePhase={titleBasePhase}
       exportPhase={exportPhase}
       fontsReady={fontsReady}

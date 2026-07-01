@@ -401,6 +401,9 @@ export function ControlPanel({
   focusReq,
   fontsReady = false,
 }: Props) {
+  // Any export in progress (JPG or MP4) locks the panel — MP4 is an async per-frame
+  // DOM capture, so the composition must not change mid-capture.
+  const isExporting = exporting || !!exportingMp4;
   const update = (patch: Partial<Composition>) => setComp((c) => ({ ...c, ...patch }));
   const fileRef = useRef<HTMLInputElement>(null);
   const multiFileRef = useRef<HTMLInputElement>(null);
@@ -479,8 +482,16 @@ export function ControlPanel({
     <aside className="flex w-[480px] shrink-0 flex-col gap-4 overflow-y-auto border-r border-border bg-background p-5">
       <Wordmark />
 
-      {!isFreeform && (
-        <Section title="Format">
+      {/* All editing controls lock during an export. `inert` makes the whole
+          subtree non-interactive (no pointer, focus, or keyboard) so the live
+          composition can't change out from under an in-progress capture; the
+          Export section below stays interactive and keeps updating its progress. */}
+      <div
+        className={cn("flex flex-col gap-4", isExporting && "pointer-events-none opacity-50")}
+        inert={isExporting || undefined}
+      >
+        {!isFreeform && (
+          <Section title="Format">
           <SegmentedControl
             options={FORMATS}
             value={comp.format}
@@ -936,7 +947,7 @@ export function ControlPanel({
 
         <div className="flex items-center justify-between pt-3">
           <Label className="text-xs">
-            Title animation
+            Export animated title
             {comp.titleMode === "heavy" ? (
               <span className="ml-1 text-muted-foreground">(not in Heavy)</span>
             ) : (
@@ -944,20 +955,6 @@ export function ControlPanel({
             )}
           </Label>
           <div className="flex items-center gap-1">
-            {comp.titleAnimate && comp.titleMode !== "heavy" && (
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7"
-                onClick={() => update({ titleAnimPlaying: !comp.titleAnimPlaying })}
-              >
-                {comp.titleAnimPlaying ? (
-                  <Pause className="h-4 w-4" />
-                ) : (
-                  <Play className="h-4 w-4" />
-                )}
-              </Button>
-            )}
             <Switch
               checked={comp.titleAnimate}
               disabled={comp.animate || comp.titleMode === "heavy" || !fontsReady}
@@ -1068,6 +1065,7 @@ export function ControlPanel({
           </div>
         </Section>
       )}
+      </div>
 
       <Section title="Export">
         {isFreeform ? (
@@ -1098,6 +1096,7 @@ export function ControlPanel({
         <Button
           variant="outline"
           className="w-full"
+          disabled={isExporting}
           onClick={() => {
             if (window.confirm("Reset to a new composition? This clears your saved work.")) {
               onReset();

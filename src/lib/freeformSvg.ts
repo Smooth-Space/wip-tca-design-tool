@@ -92,7 +92,10 @@ function lineNaturalWidthFactor(
 
 export async function exportFreeformSVG(comp: Composition, areaWidth: number) {
   const font = await loadFont();
-  const text = comp.titles[0]?.text ?? "";
+  // Mixed mode renders uppercase (display-only — matches TitleBlock; never mutates
+  // the stored text). .toUpperCase() keeps char-index alignment with the axes.
+  const rawText = comp.titles[0]?.text ?? "";
+  const text = comp.titleMode === "mixed" ? rawText.toUpperCase() : rawText;
   const rows = text.split("\n");
   const flat = Array.from(text.replace(/\n/g, ""));
   const axes = computeAxes(flat, comp.titleMode, comp.titleSeed, {

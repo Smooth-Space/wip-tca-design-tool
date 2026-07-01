@@ -4,7 +4,6 @@ import type { Title } from "@/lib/composition";
 import { TitleSpans } from "@/components/TitleLine";
 import { TITLE_FONT, TITLE_LETTER_SPACING, TITLE_LINE_HEIGHT, shiftOffsets } from "@/lib/typo";
 import { useSelectable } from "@/components/SelectionContext";
-import { useTitleSpanAnimation } from "@/lib/titleAnim";
 
 interface TitleBlockProps {
   titles: Title[];
@@ -13,7 +12,6 @@ interface TitleBlockProps {
   titleAmplitude?: number | null;
   titlePhase?: number | null;
   titleAnimate?: boolean;
-  titleAnimPlaying?: boolean;
   titleBasePhase?: number;
   exportPhase?: number | null;
   fontsReady?: boolean;
@@ -35,7 +33,6 @@ export function TitleBlock({
   titleAmplitude = null,
   titlePhase = null,
   titleAnimate = false,
-  titleAnimPlaying = true,
   titleBasePhase = 0,
   exportPhase = null,
   fontsReady = false,
@@ -52,12 +49,17 @@ export function TitleBlock({
   );
   // A/B/C use one multi-line title field (titles[0]) only.
   const t0 = titles[0];
+  // Mixed mode renders uppercase — display-only, the stored text is never mutated.
+  // Applied before splitting/flattening so character indices stay aligned with the
+  // axis arrays. .toUpperCase() (not locale) keeps length stable.
+  const rawText = t0?.text ?? "";
+  const displayText = titleMode === "mixed" ? rawText.toUpperCase() : rawText;
   const lines = useMemo(
     () =>
-      (t0?.text ?? "")
+      displayText
         .split("\n")
         .map((text, i) => ({ text, titleId: t0?.id, key: `${t0?.id ?? "t"}-${i}` })),
-    [t0],
+    [displayText, t0?.id],
   );
   const rows = useMemo(() => lines.map((l) => l.text), [lines]);
 
@@ -68,28 +70,17 @@ export function TitleBlock({
   const rootRef = useRef<HTMLDivElement>(null);
   // Flat character stream (newlines excluded), shared by the static render and
   // the live rAF DOM-writer so span indices line up 1:1.
-  const flatChars = useMemo(() => Array.from((t0?.text ?? "").replace(/\n/g, "")), [t0]);
+  const flatChars = useMemo(() => Array.from(displayText.replace(/\n/g, "")), [displayText]);
 
-  // The live loop writes font-variation-settings straight to the spans during
-  // playback (no per-frame React render). React state (committedPhase) only
-  // covers the static/paused/export renders below.
-  const committedPhase = useTitleSpanAnimation({
-    rootRef,
-    animActive,
-    playing: titleAnimPlaying,
-    exportPhase,
-    basePhase: titleBasePhase,
-    flatChars,
-    mode: titleMode,
-    seed: titleSeed,
-    amplitude: titleAmplitude,
-    fontsReady,
-  });
-
+  // Live playback was removed (the per-frame rAF loop was unstable). The canvas
+  // now always renders a single static frame; only MP4 export animates, by driving
+  // exportPhase through a normal React render per frame.
+  //
   // Phase used for the React-rendered spans: explicit export phase wins (frozen,
-  // deterministic frames); otherwise the committed animation phase when active;
-  // otherwise the static titlePhase. Static behaviour is unchanged.
-  const reactPhase = exportPhase !== null ? exportPhase : animActive ? committedPhase : titlePhase;
+  // deterministic frames); otherwise the animation-ready static frame at the base
+  // phase when the toggle is on; otherwise the static titlePhase. Unchanged for
+  // non-animated titles.
+  const reactPhase = exportPhase !== null ? exportPhase : animActive ? titleBasePhase : titlePhase;
 
   const axes = useMemo(
     () =>
@@ -263,7 +254,8 @@ export function TitleBlock({
           </div>
         </>
       )}
-      {/* visible rows below pass animatable={animActive} */}
+      {/* Visible rows are animatable (three-node box-pinned structure) ONLY during
+          export (exportPhase set); the live canvas always renders the static path. */}
       {rows.map((row, r) => {
         const lineInner = (
           <div
@@ -279,7 +271,7 @@ export function TitleBlock({
               hyphens: "none",
             }}
           >
-            {renderSpans(row, r, animActive)}
+            {renderSpans(row, r, animActive && exportPhase !== null)}
           </div>
         );
         if (shiftEnabled) {
