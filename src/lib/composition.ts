@@ -6,6 +6,7 @@ import {
   GRAY_BG_STEPS,
   legalChromaticFg,
   legalGrayFg,
+  resolvePalette,
   type ColorRole,
   type GrayStep,
 } from "@/lib/palette";
@@ -171,12 +172,16 @@ export interface Composition {
   palette: PaletteState;
 }
 
+// Colors are DERIVED from defaultPalette (not hardcoded) so the default composition's
+// rendered background/title/caption colors can never drift from its palette role state.
+const _defaultResolved = resolvePalette(defaultPalette);
+
 export const defaultComposition: Composition = {
   format: "1:1",
   template: "A",
   variant: "none",
-  background: "#FFFFFF",
-  titleColor: "#000000",
+  background: _defaultResolved.background,
+  titleColor: _defaultResolved.titleColor,
   titles: [{ id: "t1", text: "Title one" }],
   titleSizePx: 120,
   titleSizeMode: "fixed",
@@ -203,7 +208,12 @@ export const defaultComposition: Composition = {
   titleAnimate: false,
   imageOverlay: 0.2,
   captions: { text1: "Text 1", text2: "Text 2", text3: "Text 3", text4: "Text 4" },
-  captionColors: { text1: "#000000", text2: "#000000", text3: "#000000", text4: "#000000" },
+  captionColors: {
+    text1: _defaultResolved.textColor,
+    text2: _defaultResolved.textColor,
+    text3: _defaultResolved.textColor,
+    text4: _defaultResolved.textColor,
+  },
   captionHidden: { text1: false, text2: false, text3: false, text4: false },
   captionAlign: { text1: "left", text2: "right", text3: "left", text4: "right" },
   captionCounts: { top: 2, bottom: 2, middle: 2 },
